@@ -1,0 +1,12 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "c3000003-0000-0000-0000-000000000003")
+	(paper "A4")
+	(title_block
+		(title "Battery Monitor Module — 03-MCU")
+		(rev "0.1")
+	)
+	(lib_symbols)
+)
