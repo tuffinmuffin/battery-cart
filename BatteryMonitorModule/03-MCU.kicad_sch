@@ -9621,7 +9621,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_USB:USB_C_Receptacle_GCT_USB4085"
+		(property "Footprint" "BatteryMonitorModule_Custom:USB4085-GF-A_GCT"
 			(at 27.94 105.41 0)
 			(hide yes)
 			(show_name no)
