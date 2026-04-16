@@ -1729,184 +1729,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:L"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 1.016)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "L"
-				(at -1.27 0 90)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "L"
-				(at 1.905 0 90)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Inductor"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "inductor choke coil reactor magnetic"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "Choke_* *Coil* Inductor_* L_*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "L_0_1"
-				(arc
-					(start 0 2.54)
-					(mid 0.6323 1.905)
-					(end 0 1.27)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 0 1.27)
-					(mid 0.6323 0.635)
-					(end 0 0)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 0 0)
-					(mid 0.6323 -0.635)
-					(end 0 -1.27)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 0 -1.27)
-					(mid 0.6323 -1.905)
-					(end 0 -2.54)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "L_1_1"
-				(pin passive line
-					(at 0 3.81 270)
-					(length 1.27)
-					(name "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -3.81 90)
-					(length 1.27)
-					(name "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Device:R"
 			(pin_numbers
 				(hide yes)
@@ -4527,22 +4349,10 @@
 		(uuid "2834dd3b-278e-4cf3-b42a-7c459ce2625e")
 	)
 	(junction
-		(at 121.92 171.45)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "483b65b4-06ed-4b25-be55-487a4b32bcf4")
-	)
-	(junction
 		(at 74.93 72.39)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "540e3e21-5e4f-4ba7-b774-1e0ba2418fd1")
-	)
-	(junction
-		(at 107.95 50.8)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "5e0743ab-5db3-4e2a-9ee7-f14cf230f2cb")
 	)
 	(junction
 		(at 68.58 29.21)
@@ -4768,16 +4578,6 @@
 	)
 	(wire
 		(pts
-			(xy 107.95 45.72) (xy 107.95 50.8)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0fc325bc-1f87-4933-b6f0-6288bc9fad72")
-	)
-	(wire
-		(pts
 			(xy 151.13 34.29) (xy 153.67 34.29)
 		)
 		(stroke
@@ -4845,16 +4645,6 @@
 			(type default)
 		)
 		(uuid "1f9b1a31-ee3b-44df-830c-4fd4592f1438")
-	)
-	(wire
-		(pts
-			(xy 107.95 50.8) (xy 113.03 50.8)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2017389f-934d-42ea-835c-44da15fdfa5d")
 	)
 	(wire
 		(pts
@@ -5035,16 +4825,6 @@
 			(type default)
 		)
 		(uuid "494535d2-dacf-427b-b721-f3ad5a1ed582")
-	)
-	(wire
-		(pts
-			(xy 107.95 33.02) (xy 107.95 38.1)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4a64e808-6b65-4745-a923-6be4f033c098")
 	)
 	(wire
 		(pts
@@ -5368,7 +5148,7 @@
 	)
 	(wire
 		(pts
-			(xy 106.68 171.45) (xy 121.92 171.45)
+			(xy 106.68 171.45) (xy 134.62 171.45)
 		)
 		(stroke
 			(width 0)
@@ -5508,23 +5288,13 @@
 	)
 	(wire
 		(pts
-			(xy 105.41 50.8) (xy 107.95 50.8)
+			(xy 105.41 50.8) (xy 113.03 50.8)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "9f926e47-7d79-4b8c-aec5-7a51df7f109f")
-	)
-	(wire
-		(pts
-			(xy 133.35 171.45) (xy 134.62 171.45)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9fa925c7-f91d-46f8-9d86-642f9a03d590")
 	)
 	(wire
 		(pts
@@ -5655,16 +5425,6 @@
 			(type default)
 		)
 		(uuid "b41d5def-2e1e-40c0-8a4e-dabedcfe1873")
-	)
-	(wire
-		(pts
-			(xy 121.92 171.45) (xy 125.73 171.45)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b4bdb459-4cae-4419-8249-087da50c84f3")
 	)
 	(wire
 		(pts
@@ -7888,84 +7648,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:PWR_FLAG")
-		(at 121.92 171.45 180)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "281e606c-1ea2-49e2-9b8d-d76d73030dd7")
-		(property "Reference" "#FLG04"
-			(at 121.92 173.355 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "PWR_FLAG"
-			(at 121.92 176.53 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 121.92 171.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 121.92 171.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Special symbol for telling ERC where power comes from"
-			(at 121.92 171.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "e596f89b-9e37-4558-a785-fcaed30e4886")
-		)
-		(instances
-			(project "BatteryMonitorModule"
-				(path "/03269402-9c05-492f-98b8-b4c760268d66/b3000003-0000-0000-0000-000000000003"
-					(reference "#FLG04")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 68.58 26.67 180)
 		(unit 1)
@@ -8429,84 +8111,6 @@
 			(project "BatteryMonitorModule"
 				(path "/03269402-9c05-492f-98b8-b4c760268d66/b3000003-0000-0000-0000-000000000003"
 					(reference "R11")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:L")
-		(at 129.54 171.45 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "548f8757-2600-401a-873d-56b9d5f3468c")
-		(property "Reference" "FB1"
-			(at 128.778 169.164 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "600R@100MHz"
-			(at 132.08 174.498 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Inductor_SMD:L_0603_1608Metric"
-			(at 129.54 171.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 129.54 171.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 129.54 171.45 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "308cfa2e-c09c-43c4-9738-7949d76ea4ac")
-		)
-		(pin "2"
-			(uuid "a9834fd9-9e8e-4b27-af1a-b93052f5ec45")
-		)
-		(instances
-			(project "BatteryMonitorModule"
-				(path "/03269402-9c05-492f-98b8-b4c760268d66/b3000003-0000-0000-0000-000000000003"
-					(reference "FB1")
 					(unit 1)
 				)
 			)
@@ -9738,84 +9342,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C")
-		(at 107.95 41.91 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "b15fe680-67bd-41bb-a8ec-43766cc4698c")
-		(property "Reference" "C9"
-			(at 105.918 39.624 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100nF"
-			(at 107.95 44.45 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
-			(at 107.95 41.91 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 107.95 41.91 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 107.95 41.91 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "84994355-ad70-48a2-ac88-6c540a75448b")
-		)
-		(pin "2"
-			(uuid "04565df0-8aa0-44b9-9777-c001bf16d528")
-		)
-		(instances
-			(project "BatteryMonitorModule"
-				(path "/03269402-9c05-492f-98b8-b4c760268d66/b3000003-0000-0000-0000-000000000003"
-					(reference "C9")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 74.93 68.58 180)
 		(unit 1)
@@ -10485,84 +10011,6 @@
 			(project "BatteryMonitorModule"
 				(path "/03269402-9c05-492f-98b8-b4c760268d66/b3000003-0000-0000-0000-000000000003"
 					(reference "J3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 107.95 33.02 180)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "e819fb69-a133-4074-b965-b7a3e2d109d0")
-		(property "Reference" "#PWR028"
-			(at 107.95 26.67 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 107.95 27.94 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 107.95 33.02 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 107.95 33.02 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 107.95 33.02 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "6c560934-a3fa-4010-9c2d-4bdb93545903")
-		)
-		(instances
-			(project "BatteryMonitorModule"
-				(path "/03269402-9c05-492f-98b8-b4c760268d66/b3000003-0000-0000-0000-000000000003"
-					(reference "#PWR028")
 					(unit 1)
 				)
 			)
