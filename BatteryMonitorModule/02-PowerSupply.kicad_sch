@@ -4110,7 +4110,7 @@
 				)
 			)
 		)
-		(property "Value" "33k"
+		(property "Value" "82k"
 			(at 39.116 76.2 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5883,7 +5883,7 @@
 				)
 			)
 		)
-		(property "Value" "82k"
+		(property "Value" "33k"
 			(at 39.464 87.63 90)
 			(show_name no)
 			(do_not_autoplace no)
