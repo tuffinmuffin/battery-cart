@@ -50,7 +50,7 @@
         "silk_text_thickness": 0.1,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.5
+          "min_clearance": 0.381
         }
       },
       "diff_pair_dimensions": [
@@ -60,7 +60,56 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        [
+          "courtyards_overlap|41811203|106803098|2f72814a-5af4-4e33-9daa-2e5960bbef68|69a34c9e-baa5-4a3e-bbd0-41f4250af770",
+          "understand off"
+        ],
+        [
+          "courtyards_overlap|44761203|107505900|69a34c9e-baa5-4a3e-bbd0-41f4250af770|6d15fb81-aa3d-47c1-b297-7aec1b5ea10b",
+          "understand off"
+        ],
+        [
+          "courtyards_overlap|45589707|106806519|2f72814a-5af4-4e33-9daa-2e5960bbef68|460904a8-fe26-4c22-88c9-690701330907",
+          "understand off"
+        ],
+        [
+          "courtyards_overlap|48539707|107505900|460904a8-fe26-4c22-88c9-690701330907|6d15fb81-aa3d-47c1-b297-7aec1b5ea10b",
+          ""
+        ],
+        [
+          "silk_over_copper|42261203|107372100|8c198a7a-147b-4f78-ab09-c707a62c0a25|2df4d70c-df40-450e-b0fc-85d0a07c38a0",
+          ""
+        ],
+        [
+          "silk_over_copper|42661203|107627900|0bae315b-a77a-42e7-adda-2d8ae42cec84|2df4d70c-df40-450e-b0fc-85d0a07c38a0",
+          ""
+        ],
+        [
+          "silk_over_copper|43911203|107372100|8c198a7a-147b-4f78-ab09-c707a62c0a25|3c29d6af-bdcc-4f3a-bace-23a6a19db918",
+          ""
+        ],
+        [
+          "silk_over_copper|44311203|107627900|0bae315b-a77a-42e7-adda-2d8ae42cec84|3c29d6af-bdcc-4f3a-bace-23a6a19db918",
+          ""
+        ],
+        [
+          "silk_over_copper|46039707|107372100|8c198a7a-147b-4f78-ab09-c707a62c0a25|7a248706-5a43-4638-9ee5-6ccff480c7de",
+          ""
+        ],
+        [
+          "silk_over_copper|46439707|107627900|0bae315b-a77a-42e7-adda-2d8ae42cec84|7a248706-5a43-4638-9ee5-6ccff480c7de",
+          ""
+        ],
+        [
+          "silk_over_copper|47689707|107372100|8c198a7a-147b-4f78-ab09-c707a62c0a25|c7b6d848-5553-4f9c-9905-fcf2b6722962",
+          ""
+        ],
+        [
+          "silk_over_copper|48089707|107627900|0bae315b-a77a-42e7-adda-2d8ae42cec84|c7b6d848-5553-4f9c-9905-fcf2b6722962",
+          ""
+        ]
+      ],
       "meta": {
         "version": 2
       },
@@ -138,7 +187,7 @@
         "min_hole_to_hole": 0.25,
         "min_microvia_diameter": 0.2,
         "min_microvia_drill": 0.1,
-        "min_resolved_spokes": 2,
+        "min_resolved_spokes": 1,
         "min_silk_clearance": 0.0,
         "min_text_height": 0.8,
         "min_text_thickness": 0.08,
@@ -658,7 +707,7 @@
         "uuid": "03269402-9c05-492f-98b8-b4c760268d66"
       }
     ],
-    "used_designators": "",
+    "used_designators": "H1-4,#PWR28",
     "variants": []
   },
   "sheets": [
