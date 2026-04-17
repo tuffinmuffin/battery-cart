@@ -3827,6 +3827,17 @@
 				)
 			)
 		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 105.41 67.31 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "3b4e3a8d-98a0-487a-9bf6-7a74838970b7")
 		)
@@ -3975,6 +3986,17 @@
 		)
 		(property "Description" ""
 			(at 129.54 81.28 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 129.54 81.28 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4388,6 +4410,17 @@
 				)
 			)
 		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 96.52 62.23 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "aeb7afe6-53db-4715-a1c8-da511f4fc513")
 		)
@@ -4466,6 +4499,17 @@
 				)
 			)
 		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 90.17 25.4 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "ed09a348-64db-460b-bd70-79ca94eacf84")
 		)
@@ -4536,6 +4580,17 @@
 		)
 		(property "Description" ""
 			(at 135.89 73.66 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 135.89 73.66 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4700,6 +4755,17 @@
 				)
 			)
 		)
+		(property "KiLib_Generator" "package/TO_SOT/THT"
+			(at 105.41 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "3"
 			(uuid "ce8e7bd0-aa4e-442b-8997-87873ffff977")
 		)
@@ -4781,6 +4847,17 @@
 				)
 			)
 		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 59.69 33.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "5ea6a1a2-858a-4a68-bdd6-27b3a9de4ccc")
 		)
@@ -4851,6 +4928,17 @@
 		)
 		(property "Description" ""
 			(at 109.22 29.21 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "KiLib_Generator" "package/gullwing"
+			(at 109.22 29.21 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4940,6 +5028,17 @@
 				)
 			)
 		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 73.66 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "bd10d9cc-f37a-4579-848e-a4c49c4b805e")
 		)
@@ -4986,7 +5085,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Fuse:FuseHolder_Blade_ATO_Littelfuse_FLR_178.6165"
+		(property "Footprint" "BatteryMonitorModule_Custom:FUSE_BK-6013"
 			(at 43.18 45.72 0)
 			(hide yes)
 			(show_name no)
@@ -5253,6 +5352,17 @@
 				)
 			)
 		)
+		(property "KiLib_Generator" "package/gullwing"
+			(at 85.09 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "3"
 			(uuid "e22ffb88-ba0c-43b1-b9b2-c19fbecfbb76")
 		)
@@ -5326,6 +5436,17 @@
 		)
 		(property "Description" ""
 			(at 78.74 74.93 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 78.74 74.93 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5691,7 +5812,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Fuse:FuseHolder_Blade_ATO_Littelfuse_FLR_178.6165"
+		(property "Footprint" "BatteryMonitorModule_Custom:FUSE_BK-6013"
 			(at 39.37 50.8 0)
 			(hide yes)
 			(show_name no)
@@ -5801,6 +5922,17 @@
 				)
 			)
 		)
+		(property "KiLib_Generator" "package/gullwing"
+			(at 72.39 48.26 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "d1c4047f-9cfb-4fff-8079-72b8ce7bc748")
 		)
@@ -5874,6 +6006,17 @@
 		)
 		(property "Description" ""
 			(at 121.92 73.66 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 121.92 73.66 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects

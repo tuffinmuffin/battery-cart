@@ -43,4 +43,10 @@
   (fp_line (start 1.6383 -1.7526) (end 1.6383 1.7526) (layer "F.Fab") (width 0.0254))
   (pad "1" smd rect (at 0 0) (size 2.1082 1.6002) (layers "F.Cu" "F.Paste" "F.Mask"))
   (pad "2" smd rect (at 9.271 0) (size 2.1082 1.6002) (layers "F.Cu" "F.Paste" "F.Mask"))
+
+  (model "${KIPRJMOD}/BatteryMonitorModule_Custom.3dshapes/SWITCH_FSMSM_TYC.step"
+    (offset (xyz 4.635 0 4.42))
+    (scale (xyz 1 1 1))
+    (rotate (xyz 0 0 90))
+  )
 )

@@ -46,4 +46,10 @@
   (fp_line (start -2.5019 -2.5019) (end -2.5019 2.5019) (layer "F.Fab") (width 0.0254))
   (pad "1" smd rect (at -1.7526 0) (size 2.0066 5.3086) (layers "F.Cu" "F.Paste" "F.Mask"))
   (pad "2" smd rect (at 1.7526 0) (size 2.0066 5.3086) (layers "F.Cu" "F.Paste" "F.Mask"))
+
+  (model "${KIPRJMOD}/BatteryMonitorModule_Custom.3dshapes/IND_BOURNS_SRR4028.step"
+    (offset (xyz 0 0 0))
+    (scale (xyz 1 1 1))
+    (rotate (xyz 0 0 0))
+  )
 )
