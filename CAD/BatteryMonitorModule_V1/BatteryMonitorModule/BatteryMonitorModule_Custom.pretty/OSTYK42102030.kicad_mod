@@ -1,0 +1,238 @@
+(footprint "OSTYK42102030"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(tags "barrier block screw terminal 8.25mm")
+	(property "Reference" "REF**"
+		(at 0 3.5 0)
+		(layer "F.SilkS")
+		(uuid "fcfd2c6e-8e23-4390-be9b-e02384065ae4")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "OSTYK42102030"
+		(at 0 -12.5 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "60afd500-f647-42dc-8f0d-d6efcca6373a")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "146253bc-4dcb-4687-9ff1-6fe31a916d70")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0ceab0c6-de9d-4bdc-a9a8-dfcb42e7893e")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -8.75 -10.4)
+		(end -8.75 2.3)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "805a7e15-1137-4fc8-baf2-edc0991c5854")
+	)
+	(fp_line
+		(start -8.75 2.3)
+		(end 8.75 2.3)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "190e4eab-d1fe-4f63-a517-5470393741a1")
+	)
+	(fp_line
+		(start 8.75 -10.4)
+		(end -8.75 -10.4)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "d383300e-c0fc-4d28-899e-4ac5f2389f97")
+	)
+	(fp_line
+		(start 8.75 2.3)
+		(end 8.75 -10.4)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "99456520-250f-4ba2-a228-b4d310ce9c15")
+	)
+	(fp_line
+		(start -9.25 -11)
+		(end -9.25 2.8)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "f5f3d2f3-69c7-4f00-ae69-e6289474c804")
+	)
+	(fp_line
+		(start -9.25 2.8)
+		(end 9.25 2.8)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "2c4b7a99-b3d8-428e-8ffc-0a81363db517")
+	)
+	(fp_line
+		(start 9.25 -11)
+		(end -9.25 -11)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "d8024e24-2c15-4d61-8a69-e4bed238601c")
+	)
+	(fp_line
+		(start 9.25 2.8)
+		(end 9.25 -11)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "71b7ff32-879a-4d1a-a764-8a1426c98f9e")
+	)
+	(fp_line
+		(start -8.75 -10.4)
+		(end -8.75 2.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "82cd7245-b235-47ef-9377-74aec19fe51d")
+	)
+	(fp_line
+		(start -8.75 2.3)
+		(end -6.75 2.3)
+		(stroke
+			(width 0.3)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "8f02a523-364b-4bf0-b482-8c6d28d58a31")
+	)
+	(fp_line
+		(start -8.75 2.3)
+		(end 8.75 2.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "e23e434f-10e5-4764-b575-d6928cf065ae")
+	)
+	(fp_line
+		(start 8.75 -10.4)
+		(end -8.75 -10.4)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "81c2535b-faa2-4b30-a7ca-cc32a5112cf4")
+	)
+	(fp_line
+		(start 8.75 2.3)
+		(end 8.75 -10.4)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "d03d0477-4af3-4ee7-9b8e-b025a850b39a")
+	)
+	(fp_text user "12V+"
+		(at -4.125 1.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "8ded653f-f614-4fc3-91d0-3417f7e431a8")
+		(effects
+			(font
+				(size 0.6 0.6)
+				(thickness 0.1)
+			)
+			(justify left)
+		)
+	)
+	(fp_text user "12V-"
+		(at 4.125 1.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "475dd47b-901d-4e23-aaf0-cb80b865fc88")
+		(effects
+			(font
+				(size 0.6 0.6)
+				(thickness 0.1)
+			)
+			(justify left)
+		)
+	)
+	(pad "1" thru_hole rect
+		(at -4.125 0)
+		(size 3 3)
+		(drill 1.85)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "037226b0-7407-49e0-8847-43a2195f6a06")
+	)
+	(pad "2" thru_hole circle
+		(at 4.125 0)
+		(size 3 3)
+		(drill 1.85)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "cfcf614b-8245-422c-a330-bd553ab5bb0c")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/BatteryMonitorModule_Custom.3dshapes/OSTYK42102030.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)
