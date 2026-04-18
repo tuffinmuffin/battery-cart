@@ -6,4 +6,5 @@
 	(lib (name "TC2117-3.3VDBTR") (type "KiCad") (uri "${KIPRJMOD}/BatteryMonitorModule_Custom.pretty/TC2117-3.3VDBTR.kicad_sym") (options "") (descr ""))
 	(lib (name "INA226AQDGSRQ1") (type "KiCad") (uri "${KIPRJMOD}/BatteryMonitorModule_Custom.pretty/INA226AQDGSRQ1.kicad_sym") (options "") (descr ""))
 	(lib (name "USB4085-GF-A_REVA4") (type "KiCad") (uri "${KIPRJMOD}/BatteryMonitorModule_Custom.pretty/USB4085-GF-A_REVA4.kicad_sym") (options "") (descr ""))
+	(lib (name "AO4407A") (type "KiCad") (uri "${KIPRJMOD}/BatteryMonitorModule_Custom.pretty/AO4407A.kicad_sym") (options "") (descr ""))
 )
