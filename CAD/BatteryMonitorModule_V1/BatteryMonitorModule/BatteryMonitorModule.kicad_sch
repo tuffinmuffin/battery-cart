@@ -4950,6 +4950,355 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "G5Q-14-fixed:G5Q-1-Fixed"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "K"
+				(at 11.43 3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "G5Q-1-Fixed"
+				(at 11.43 1.27 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "Relay_THT:Relay_SPDT_Omron-G5Q-1"
+				(at 11.43 -1.27 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Datasheet" "https://www.omron.com/ecb/products/pdf/en-g5q.pdf"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Description" "Omron G5G relay, Miniature Single Pole, SPDT, 10A"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "Miniature Single Pole Relay"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Relay*SPDT*Omron*G5Q*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "G5Q-1-Fixed_0_0"
+				(polyline
+					(pts
+						(xy 7.62 5.08) (xy 7.62 2.54) (xy 6.985 3.175) (xy 7.62 3.81)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "G5Q-1-Fixed_0_1"
+				(rectangle
+					(start -10.16 5.08)
+					(end 10.16 -5.08)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -8.255 1.905)
+					(end -1.905 -1.905)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -7.62 -1.905) (xy -2.54 1.905)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.08 5.08) (xy -5.08 1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.08 -5.08) (xy -5.08 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.905 0) (xy -1.27 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.635 0) (xy 0 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 0) (xy 1.27 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.905 0) (xy 2.54 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 5.08) (xy 2.54 2.54) (xy 3.175 3.175) (xy 2.54 3.81)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.175 0) (xy 3.81 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 5.08 -2.54) (xy 3.175 3.81)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 5.08 -2.54) (xy 5.08 -5.08)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "G5Q-1-Fixed_1_1"
+				(pin passive line
+					(at -5.08 -7.62 90)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 7.62 270)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 7.62 7.62 270)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 -7.62 90)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 7.62 270)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "INA226AQDGSRQ1:INA226AQDGSRQ1"
 			(pin_names
 				(offset 0.254)
@@ -6331,355 +6680,6 @@
 						)
 					)
 					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "Relay:G5Q-1"
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "K"
-				(at 11.43 3.81 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "G5Q-1"
-				(at 11.43 1.27 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Footprint" "Relay_THT:Relay_SPDT_Omron-G5Q-1"
-				(at 11.43 -1.27 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Datasheet" "https://www.omron.com/ecb/products/pdf/en-g5q.pdf"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Description" "Omron G5G relay, Miniature Single Pole, SPDT, 10A"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "Miniature Single Pole Relay"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "Relay*SPDT*Omron*G5Q*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "G5Q-1_0_0"
-				(polyline
-					(pts
-						(xy 7.62 5.08) (xy 7.62 2.54) (xy 6.985 3.175) (xy 7.62 3.81)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "G5Q-1_0_1"
-				(rectangle
-					(start -10.16 5.08)
-					(end 10.16 -5.08)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(rectangle
-					(start -8.255 1.905)
-					(end -1.905 -1.905)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -7.62 -1.905) (xy -2.54 1.905)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -5.08 5.08) (xy -5.08 1.905)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -5.08 -5.08) (xy -5.08 -1.905)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.905 0) (xy -1.27 0)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.635 0) (xy 0 0)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.635 0) (xy 1.27 0)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.905 0) (xy 2.54 0)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 5.08) (xy 2.54 2.54) (xy 3.175 3.175) (xy 2.54 3.81)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 3.175 0) (xy 3.81 0)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 5.08 -2.54) (xy 3.175 3.81)
-					)
-					(stroke
-						(width 0.508)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 5.08 -2.54) (xy 5.08 -5.08)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "G5Q-1_1_1"
-				(pin passive line
-					(at -5.08 -7.62 90)
-					(length 2.54)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 -7.62 90)
-					(length 2.54)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 7.62 7.62 270)
-					(length 2.54)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 2.54 7.62 270)
-					(length 2.54)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 7.62 270)
-					(length 2.54)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -8771,26 +8771,6 @@
 		)
 		(uuid "09f61bb9-a90e-49eb-86cd-061de7e032fc")
 	)
-	(text "CHARG RTN"
-		(exclude_from_sim no)
-		(at 33.274 42.418 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "0e34e051-8011-4a7b-bc36-8cde8f4a1217")
-	)
-	(text "SUP RTN"
-		(exclude_from_sim no)
-		(at 31.242 36.576 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "1528ff47-8f74-47d5-b525-ccea708b6283")
-	)
 	(text "Power Indicator"
 		(exclude_from_sim no)
 		(at 48.514 157.734 0)
@@ -8830,16 +8810,6 @@
 			)
 		)
 		(uuid "584a5324-772b-4645-880c-febfe1efaad9")
-	)
-	(text "BATT+"
-		(exclude_from_sim no)
-		(at 30.988 50.038 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "6b41cf15-86d3-4508-b636-227858aa4023")
 	)
 	(text "Charging and Test"
 		(exclude_from_sim no)
@@ -8911,16 +8881,6 @@
 		)
 		(uuid "a65ea97c-745b-44f5-935e-9fa524e60be5")
 	)
-	(text "CHARG+"
-		(exclude_from_sim no)
-		(at 31.75 44.704 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "c513acd1-7c73-4418-83f3-5fc6a98a9efa")
-	)
 	(text "5V USB Bus -> Diode ->12V bus\nNominally if 12V is present, USB =5VUsb \ndon't pass\nIf no 12V but only 5V then 5V will\nbe on 12V bus.\nBAT+ load transitor is connected to \nBattery so we can run power tests without 12V."
 		(exclude_from_sim no)
 		(at 101.092 189.992 0)
@@ -8951,16 +8911,6 @@
 			)
 		)
 		(uuid "ea93a878-637d-4671-8956-e37a9b52d394")
-	)
-	(text "BATT -"
-		(exclude_from_sim no)
-		(at 31.496 47.498 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "fa56f931-8710-436c-8b32-fbe139e06373")
 	)
 	(text_box "Place RT1 physicaly near R7/R8/Q2\nPlace Q2 near R7/R8\nPlace R7/R8 side by side"
 		(exclude_from_sim no)
@@ -9269,12 +9219,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "d5a6b781-fcc6-4d3f-97e4-d61c2de2e327")
-	)
-	(junction
-		(at 80.01 31.75)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "d8d247e9-05a7-4e9a-87ef-4215448a34d3")
 	)
 	(junction
 		(at 34.29 177.8)
@@ -10826,7 +10770,7 @@
 	)
 	(wire
 		(pts
-			(xy 22.86 50.8) (xy 35.56 50.8)
+			(xy 22.86 50.8) (xy 38.1 50.8)
 		)
 		(stroke
 			(width 0)
@@ -11376,7 +11320,7 @@
 	)
 	(wire
 		(pts
-			(xy 43.18 50.8) (xy 52.07 50.8)
+			(xy 45.72 50.8) (xy 52.07 50.8)
 		)
 		(stroke
 			(width 0)
@@ -11464,7 +11408,7 @@
 		)
 		(uuid "e2d9cf10-4c10-41e0-977c-b6d9320e88a5")
 	)
-	(global_label "USB_DM"
+	(global_label "USB_D+"
 		(shape input)
 		(at 232.41 74.93 0)
 		(fields_autoplaced yes)
@@ -11476,7 +11420,7 @@
 		)
 		(uuid "13dc58d6-fcf5-4a80-bf5d-445701f4c0c8")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 242.8942 74.93 0)
+			(at 243.0152 74.93 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -11488,7 +11432,7 @@
 			)
 		)
 	)
-	(global_label "SHUNT_N"
+	(global_label "SHUNT-"
 		(shape input)
 		(at 59.69 46.99 90)
 		(fields_autoplaced yes)
@@ -11704,7 +11648,7 @@
 			)
 		)
 	)
-	(global_label "USB_DP"
+	(global_label "USB_D+"
 		(shape input)
 		(at 163.83 38.1 0)
 		(fields_autoplaced yes)
@@ -11716,7 +11660,55 @@
 		)
 		(uuid "47dd826d-725a-48fd-9014-7b1a810ac23d")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 174.1328 38.1 0)
+			(at 174.4352 38.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+	)
+	(global_label "BATT+"
+		(shape input)
+		(at 78.74 58.42 270)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "48bdab12-33ba-4712-9c78-550e3087b4c5")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 78.74 67.2714 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
+	(global_label "BATT+"
+		(shape input)
+		(at 80.01 31.75 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4a4c150b-9193-4029-825e-105fe15432dd")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 80.01 22.8986 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -11776,7 +11768,7 @@
 			)
 		)
 	)
-	(global_label "SHUNT_N"
+	(global_label "SHUNT-"
 		(shape input)
 		(at 247.65 146.05 0)
 		(fields_autoplaced yes)
@@ -11848,7 +11840,7 @@
 			)
 		)
 	)
-	(global_label "USB_DP"
+	(global_label "USB_D-"
 		(shape input)
 		(at 232.41 77.47 0)
 		(fields_autoplaced yes)
@@ -11860,7 +11852,7 @@
 		)
 		(uuid "61a429f9-60a9-46c1-957f-26e026e9c4bc")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 242.7128 77.47 0)
+			(at 243.0152 77.47 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12016,7 +12008,7 @@
 			)
 		)
 	)
-	(global_label "SHUNT_P"
+	(global_label "SHUNT+"
 		(shape input)
 		(at 247.65 143.51 0)
 		(fields_autoplaced yes)
@@ -12109,6 +12101,30 @@
 					(size 1.27 1.27)
 				)
 				(justify left)
+			)
+		)
+	)
+	(global_label "CHARG+"
+		(shape input)
+		(at 22.86 45.72 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "7e159caf-ccc3-48ff-bfcd-f1738c13560b")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 12.0733 45.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
 			)
 		)
 	)
@@ -12208,6 +12224,30 @@
 			)
 		)
 	)
+	(global_label "BATT+"
+		(shape input)
+		(at 22.86 50.8 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "91d9cfcd-9b89-4807-a454-37045ce05cea")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 14.0086 50.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
 	(global_label "I2C1_SDA"
 		(shape input)
 		(at 147.32 152.4 0)
@@ -12256,7 +12296,7 @@
 			)
 		)
 	)
-	(global_label "SHUNT_P"
+	(global_label "SHUNT+"
 		(shape input)
 		(at 247.65 148.59 0)
 		(fields_autoplaced yes)
@@ -12328,7 +12368,7 @@
 			)
 		)
 	)
-	(global_label "USB_DM"
+	(global_label "USB_D-"
 		(shape input)
 		(at 163.83 33.02 0)
 		(fields_autoplaced yes)
@@ -12340,7 +12380,7 @@
 		)
 		(uuid "afd6897a-2539-4b85-8f77-59c403be7965")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 174.3142 33.02 0)
+			(at 174.4352 33.02 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12784,7 +12824,7 @@
 			)
 		)
 	)
-	(global_label "SHUNT_P"
+	(global_label "SHUNT+"
 		(shape input)
 		(at 54.61 46.99 90)
 		(fields_autoplaced yes)
@@ -13064,84 +13104,6 @@
 			(project "BatteryMonitorModule"
 				(path "/03269402-9c05-492f-98b8-b4c760268d66"
 					(reference "#PWR022")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+3.3V")
-		(at 80.01 31.75 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "0e0a467f-6930-4958-ba87-bbbdddd4d8e2")
-		(property "Reference" "#PWR010"
-			(at 83.82 31.75 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "+BATT"
-			(at 79.756 29.972 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 80.01 31.75 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 80.01 31.75 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
-			(at 80.01 31.75 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "588e954e-df9b-439e-bf91-0e1a6e6c1f89")
-		)
-		(instances
-			(project "BatteryMonitorModule"
-				(path "/03269402-9c05-492f-98b8-b4c760268d66"
-					(reference "#PWR010")
 					(unit 1)
 				)
 			)
@@ -13699,7 +13661,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "17a792df-fd37-433a-92d0-f89da438c94c")
-		(property "Reference" "F4"
+		(property "Reference" "F3"
 			(at 71.12 174.752 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -13760,7 +13722,7 @@
 		(instances
 			(project "BatteryMonitorModule"
 				(path "/03269402-9c05-492f-98b8-b4c760268d66"
-					(reference "F4")
+					(reference "F3")
 					(unit 1)
 				)
 			)
@@ -14856,7 +14818,7 @@
 			)
 		)
 		(property "Value" "QT06ADP83H0000G"
-			(at 21.082 52.07 90)
+			(at 21.844 44.196 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -15993,7 +15955,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "6020122c-a047-4f53-bcde-670563086932")
-		(property "Reference" "F3"
+		(property "Reference" "F2"
 			(at 41.91 43.688 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -16054,7 +16016,7 @@
 		(instances
 			(project "BatteryMonitorModule"
 				(path "/03269402-9c05-492f-98b8-b4c760268d66"
-					(reference "F3")
+					(reference "F2")
 					(unit 1)
 				)
 			)
@@ -19846,7 +19808,7 @@
 	)
 	(symbol
 		(lib_id "Device:Fuse")
-		(at 39.37 50.8 90)
+		(at 41.91 50.8 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -19855,8 +19817,8 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "c4e4f1ac-6732-4adc-a801-f35c7c191504")
-		(property "Reference" "F2"
-			(at 38.092 48.768 90)
+		(property "Reference" "F1"
+			(at 40.632 48.768 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -19866,7 +19828,7 @@
 			)
 		)
 		(property "Value" "7.5A ATM"
-			(at 39.616 53.086 90)
+			(at 42.156 53.086 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -19876,7 +19838,7 @@
 			)
 		)
 		(property "Footprint" "BatteryMonitorModule_Custom:FUSE_BK-6013"
-			(at 39.37 50.8 0)
+			(at 41.91 50.8 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -19887,7 +19849,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 39.37 50.8 0)
+			(at 41.91 50.8 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -19898,7 +19860,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 39.37 50.8 0)
+			(at 41.91 50.8 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -19916,7 +19878,7 @@
 		(instances
 			(project "BatteryMonitorModule"
 				(path "/03269402-9c05-492f-98b8-b4c760268d66"
-					(reference "F2")
+					(reference "F1")
 					(unit 1)
 				)
 			)
@@ -20839,84 +20801,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+BATT")
-		(at 78.74 58.42 180)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "dfddd907-1b20-4b8c-a4d2-84bebdbb6059")
-		(property "Reference" "#PWR09"
-			(at 78.74 54.61 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "+BATT"
-			(at 78.74 63.5 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 78.74 58.42 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 78.74 58.42 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+BATT\""
-			(at 78.74 58.42 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "31fdd116-0ff7-4191-b311-48c0f24b417f")
-		)
-		(instances
-			(project "BatteryMonitorModule"
-				(path "/03269402-9c05-492f-98b8-b4c760268d66"
-					(reference "#PWR09")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 96.52 191.77 0)
 		(unit 1)
@@ -21670,7 +21554,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Relay:G5Q-1")
+		(lib_id "G5Q-14-fixed:G5Q-1-Fixed")
 		(at 88.9 45.72 270)
 		(unit 1)
 		(body_style 1)
@@ -21712,7 +21596,7 @@
 				(justify left)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.omron.com/ecb/products/pdf/en-g5q.pdf"
 			(at 88.9 45.72 0)
 			(hide yes)
 			(show_name no)
@@ -21724,7 +21608,7 @@
 				(justify left)
 			)
 		)
-		(property "Description" "G5Q-14-DC12 SPDT relay"
+		(property "Description" "Omron G5G relay, Miniature Single Pole, SPDT, 10A"
 			(at 88.9 45.72 0)
 			(hide yes)
 			(show_name no)

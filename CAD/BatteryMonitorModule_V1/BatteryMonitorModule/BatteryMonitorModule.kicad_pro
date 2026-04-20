@@ -60,56 +60,7 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [
-        [
-          "courtyards_overlap|41811203|106803098|2f72814a-5af4-4e33-9daa-2e5960bbef68|69a34c9e-baa5-4a3e-bbd0-41f4250af770",
-          "understand off"
-        ],
-        [
-          "courtyards_overlap|44761203|107505900|69a34c9e-baa5-4a3e-bbd0-41f4250af770|6d15fb81-aa3d-47c1-b297-7aec1b5ea10b",
-          "understand off"
-        ],
-        [
-          "courtyards_overlap|45589707|106806519|2f72814a-5af4-4e33-9daa-2e5960bbef68|460904a8-fe26-4c22-88c9-690701330907",
-          "understand off"
-        ],
-        [
-          "courtyards_overlap|48539707|107505900|460904a8-fe26-4c22-88c9-690701330907|6d15fb81-aa3d-47c1-b297-7aec1b5ea10b",
-          ""
-        ],
-        [
-          "silk_over_copper|42261203|107372100|8c198a7a-147b-4f78-ab09-c707a62c0a25|2df4d70c-df40-450e-b0fc-85d0a07c38a0",
-          ""
-        ],
-        [
-          "silk_over_copper|42661203|107627900|0bae315b-a77a-42e7-adda-2d8ae42cec84|2df4d70c-df40-450e-b0fc-85d0a07c38a0",
-          ""
-        ],
-        [
-          "silk_over_copper|43911203|107372100|8c198a7a-147b-4f78-ab09-c707a62c0a25|3c29d6af-bdcc-4f3a-bace-23a6a19db918",
-          ""
-        ],
-        [
-          "silk_over_copper|44311203|107627900|0bae315b-a77a-42e7-adda-2d8ae42cec84|3c29d6af-bdcc-4f3a-bace-23a6a19db918",
-          ""
-        ],
-        [
-          "silk_over_copper|46039707|107372100|8c198a7a-147b-4f78-ab09-c707a62c0a25|7a248706-5a43-4638-9ee5-6ccff480c7de",
-          ""
-        ],
-        [
-          "silk_over_copper|46439707|107627900|0bae315b-a77a-42e7-adda-2d8ae42cec84|7a248706-5a43-4638-9ee5-6ccff480c7de",
-          ""
-        ],
-        [
-          "silk_over_copper|47689707|107372100|8c198a7a-147b-4f78-ab09-c707a62c0a25|c7b6d848-5553-4f9c-9905-fcf2b6722962",
-          ""
-        ],
-        [
-          "silk_over_copper|48089707|107627900|0bae315b-a77a-42e7-adda-2d8ae42cec84|c7b6d848-5553-4f9c-9905-fcf2b6722962",
-          ""
-        ]
-      ],
+      "drc_exclusions": [],
       "meta": {
         "version": 2
       },
@@ -707,7 +658,7 @@
         "uuid": "03269402-9c05-492f-98b8-b4c760268d66"
       }
     ],
-    "used_designators": "LED1-3,K1,C1-9,J1-7,R1-28,#FLG1-5,RT1,D1-4,#PWR1-34,F1-4,H1-4,L1,PE_GND1,Q1-6,SW1-2,TP1,U1-3",
+    "used_designators": "",
     "variants": []
   },
   "sheets": [
