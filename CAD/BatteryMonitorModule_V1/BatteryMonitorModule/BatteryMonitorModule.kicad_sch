@@ -12945,7 +12945,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965_Pad"
 			(at 167.64 151.13 0)
 			(hide yes)
 			(show_name no)
@@ -14287,7 +14287,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965_Pad"
 			(at 172.72 151.13 0)
 			(hide yes)
 			(show_name no)
@@ -15363,7 +15363,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965_Pad"
 			(at 162.56 151.13 0)
 			(hide yes)
 			(show_name no)
@@ -15498,7 +15498,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "54a143e7-bf8b-4363-8d15-e011980d22e9")
-		(property "Reference" "F1"
+		(property "Reference" "TF1"
 			(at 21.59 74.93 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -15561,7 +15561,7 @@
 		(instances
 			(project "BatteryMonitorModule"
 				(path "/03269402-9c05-492f-98b8-b4c760268d66"
-					(reference "F1")
+					(reference "TF1")
 					(unit 1)
 				)
 			)
@@ -19386,7 +19386,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965_Pad"
 			(at 177.8 151.13 0)
 			(hide yes)
 			(show_name no)
