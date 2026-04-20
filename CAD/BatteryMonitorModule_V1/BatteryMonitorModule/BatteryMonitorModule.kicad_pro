@@ -707,17 +707,13 @@
         "uuid": "03269402-9c05-492f-98b8-b4c760268d66"
       }
     ],
-    "used_designators": "R14-15,J4,#FLG3,#PWR31-33",
+    "used_designators": "LED1-3,K1,C1-9,J1-7,R1-28,#FLG1-5,RT1,D1-4,#PWR1-34,F1-4,H1-4,L1,PE_GND1,Q1-6,SW1-2,TP1,U1-3",
     "variants": []
   },
   "sheets": [
     [
       "03269402-9c05-492f-98b8-b4c760268d66",
       "BatteryMonitorModule"
-    ],
-    [
-      "b3000003-0000-0000-0000-000000000003",
-      "03-MCU"
     ]
   ],
   "text_variables": {},
