@@ -60,7 +60,28 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        [
+          "courtyards_overlap|31538386|27322200|9e09484b-b13a-48fe-843b-5d95455bc3d5|ea229151-32f7-4b72-b587-1634e9ab8ae0",
+          ""
+        ],
+        [
+          "courtyards_overlap|44635000|83571475|387ce521-cc33-4b37-a450-b2ce63fd47ce|9799db6b-48d2-479b-aaea-e2594d99badc",
+          ""
+        ],
+        [
+          "courtyards_overlap|45365000|83571475|387ce521-cc33-4b37-a450-b2ce63fd47ce|e2373762-3b34-4618-827b-15d1a745a871",
+          ""
+        ],
+        [
+          "lib_footprint_mismatch|48792961|36009934|ea229151-32f7-4b72-b587-1634e9ab8ae0|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "lib_footprint_mismatch|73027500|39500000|8753c972-af69-4864-a4f0-3b338fc0aa47|00000000-0000-0000-0000-000000000000",
+          ""
+        ]
+      ],
       "meta": {
         "version": 2
       },
@@ -134,7 +155,7 @@
         "min_connection": 0.0,
         "min_copper_edge_clearance": 0.5,
         "min_groove_width": 0.0,
-        "min_hole_clearance": 0.25,
+        "min_hole_clearance": 0.2,
         "min_hole_to_hole": 0.25,
         "min_microvia_diameter": 0.2,
         "min_microvia_drill": 0.1,
@@ -658,7 +679,7 @@
         "uuid": "03269402-9c05-492f-98b8-b4c760268d66"
       }
     ],
-    "used_designators": "",
+    "used_designators": "H5-6",
     "variants": []
   },
   "sheets": [
