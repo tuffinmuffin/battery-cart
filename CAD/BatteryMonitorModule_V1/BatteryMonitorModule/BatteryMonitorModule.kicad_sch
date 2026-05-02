@@ -6444,6 +6444,102 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Mechanical:Fiducial"
+			(exclude_from_sim no)
+			(in_bom no)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "FID"
+				(at 0 5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Fiducial"
+				(at 0 3.175 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Fiducial Marker"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "fiducial marker"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Fiducial*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Fiducial_0_1"
+				(circle
+					(center 0 0)
+					(radius 1.27)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Mechanical:MountingHole"
 			(pin_names
 				(offset 1.016)
@@ -8541,7 +8637,7 @@
 	)
 	(text "Mounting"
 		(exclude_from_sim no)
-		(at 166.624 145.034 0)
+		(at 166.624 147.574 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -8781,7 +8877,7 @@
 		(uuid "70491a5f-6d89-4a48-a073-2e27423a59f9")
 	)
 	(junction
-		(at 167.64 153.67)
+		(at 167.64 156.21)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "71096c79-5dcd-4614-a6b9-0fe61a085022")
@@ -8823,7 +8919,7 @@
 		(uuid "880ab4c7-2128-4bd3-bdef-2fe8e17440ab")
 	)
 	(junction
-		(at 170.18 153.67)
+		(at 170.18 156.21)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "8b94ac6e-0f57-4930-8a80-d4ac5db67f1e")
@@ -8865,7 +8961,7 @@
 		(uuid "a419889a-619a-4a39-b93d-a88ddcfbae53")
 	)
 	(junction
-		(at 172.72 153.67)
+		(at 172.72 156.21)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b37500ca-9388-4945-a2d7-be3ce4bef0ce")
@@ -9194,7 +9290,7 @@
 	)
 	(wire
 		(pts
-			(xy 162.56 153.67) (xy 167.64 153.67)
+			(xy 162.56 156.21) (xy 167.64 156.21)
 		)
 		(stroke
 			(width 0)
@@ -9434,7 +9530,7 @@
 	)
 	(wire
 		(pts
-			(xy 170.18 153.67) (xy 177.8 153.67)
+			(xy 170.18 156.21) (xy 177.8 156.21)
 		)
 		(stroke
 			(width 0)
@@ -9794,7 +9890,7 @@
 	)
 	(wire
 		(pts
-			(xy 167.64 153.67) (xy 170.18 153.67)
+			(xy 167.64 156.21) (xy 170.18 156.21)
 		)
 		(stroke
 			(width 0)
@@ -11130,6 +11226,30 @@
 			)
 		)
 	)
+	(global_label "I2C2_SDA"
+		(shape input)
+		(at 110.49 133.35 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "1bd0baa5-be04-4469-91c6-96e2009bf353")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 122.3047 133.35 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+	)
 	(global_label "GPIO_BLEED"
 		(shape input)
 		(at 92.71 68.58 180)
@@ -11215,6 +11335,30 @@
 		(uuid "2d616ef9-3571-45d5-b62f-da6a54990762")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 53.6037 132.08 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+	)
+	(global_label "SW_B"
+		(shape input)
+		(at 110.49 138.43 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "30932403-1f0c-4d73-ad8a-9c472a53ccf7")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 118.3737 138.43 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -11647,6 +11791,30 @@
 		(uuid "6ad40ec6-8b24-4457-a3cd-bdffdf477e72")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 259.0414 143.51 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+	)
+	(global_label "I2C2_SCL"
+		(shape input)
+		(at 110.49 130.81 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "70f1281e-ee6f-4927-8fbd-71a464eac733")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 122.2442 130.81 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12402,6 +12570,30 @@
 			)
 		)
 	)
+	(global_label "SW_A"
+		(shape input)
+		(at 110.49 135.89 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "d62b4095-fd87-4211-8065-ee4483fb6f8d")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 118.1923 135.89 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+	)
 	(global_label "BOOT0{slash}SWDCLK"
 		(shape input)
 		(at 157.48 132.08 0)
@@ -12746,7 +12938,7 @@
 	)
 	(symbol
 		(lib_id "Mechanical:MountingHole_Pad")
-		(at 167.64 151.13 0)
+		(at 167.64 153.67 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -12757,7 +12949,7 @@
 		(fields_autoplaced yes)
 		(uuid "07381013-d29a-4ff2-b445-b7ccbbb07b9e")
 		(property "Reference" "H2"
-			(at 170.18 148.5899 0)
+			(at 170.18 151.1299 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -12768,7 +12960,7 @@
 			)
 		)
 		(property "Value" "MountingHole_Pad"
-			(at 170.18 151.1299 0)
+			(at 170.18 153.6699 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12780,7 +12972,7 @@
 			)
 		)
 		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965_Pad"
-			(at 167.64 151.13 0)
+			(at 167.64 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12791,7 +12983,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 167.64 151.13 0)
+			(at 167.64 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12802,7 +12994,7 @@
 			)
 		)
 		(property "Description" "Mounting Hole with connection"
-			(at 167.64 151.13 0)
+			(at 167.64 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12819,6 +13011,82 @@
 			(project "BatteryMonitorModule"
 				(path "/03269402-9c05-492f-98b8-b4c760268d66"
 					(reference "H2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Mechanical:Fiducial")
+		(at 185.42 118.11 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "07f4dd84-caea-4c15-9138-3af0932d9e7d")
+		(property "Reference" "FID1"
+			(at 187.96 116.8399 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Fiducial"
+			(at 187.96 119.3799 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Fiducial:Fiducial_0.5mm_Mask1.5mm"
+			(at 185.42 118.11 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 185.42 118.11 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Fiducial Marker"
+			(at 185.42 118.11 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "BatteryMonitorModule"
+				(path "/03269402-9c05-492f-98b8-b4c760268d66"
+					(reference "FID1")
 					(unit 1)
 				)
 			)
@@ -12976,6 +13244,85 @@
 			(project "BatteryMonitorModule"
 				(path "/03269402-9c05-492f-98b8-b4c760268d66"
 					(reference "#PWR020")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 110.49 128.27 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "12a290e7-c986-4764-bbc4-8d8e44e26f8a")
+		(property "Reference" "#PWR034"
+			(at 106.68 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 114.3 128.2699 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 110.49 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 110.49 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 110.49 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "bfe74614-094f-4820-9241-ce45fd9577c8")
+		)
+		(instances
+			(project "BatteryMonitorModule"
+				(path "/03269402-9c05-492f-98b8-b4c760268d66"
+					(reference "#PWR034")
 					(unit 1)
 				)
 			)
@@ -13765,6 +14112,108 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector:Conn_01x06_Pin")
+		(at 105.41 130.81 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "2dc1f6af-9db1-4667-a3bb-e691026a5516")
+		(property "Reference" "J8"
+			(at 105.938 122.396 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "J_PANEL"
+			(at 107.95 141.478 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical"
+			(at 105.41 130.81 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 105.41 130.81 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x06, script generated"
+			(at 105.41 130.81 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "KiLib_Generator" "connector/JST"
+			(at 105.41 130.81 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "94e3cfad-3b53-4979-acf5-8ff775a47127")
+		)
+		(pin "2"
+			(uuid "faf00884-5e9e-4e9e-8932-c3fb9e319ea2")
+		)
+		(pin "3"
+			(uuid "a788cdad-1551-45d2-8347-4119fb869d77")
+		)
+		(pin "4"
+			(uuid "99102cc1-fc53-4192-a907-a9281bdc72cc")
+		)
+		(pin "5"
+			(uuid "ec1d6537-5489-4058-b454-5ef04f105d85")
+		)
+		(pin "6"
+			(uuid "85a61463-b942-45d3-b088-9e88308dda9f")
+		)
+		(instances
+			(project "BatteryMonitorModule"
+				(path "/03269402-9c05-492f-98b8-b4c760268d66"
+					(reference "J8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "AO4407A:AO4407A")
 		(at 72.39 48.26 270)
 		(unit 1)
@@ -14007,7 +14456,7 @@
 	)
 	(symbol
 		(lib_id "Mechanical:MountingHole_Pad")
-		(at 172.72 151.13 0)
+		(at 172.72 153.67 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -14018,7 +14467,7 @@
 		(fields_autoplaced yes)
 		(uuid "310db511-9f6c-4c72-a4b6-66fa96dcf3f8")
 		(property "Reference" "H3"
-			(at 175.26 148.5899 0)
+			(at 175.26 151.1299 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -14029,7 +14478,7 @@
 			)
 		)
 		(property "Value" "MountingHole_Pad"
-			(at 175.26 151.1299 0)
+			(at 175.26 153.6699 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -14041,7 +14490,7 @@
 			)
 		)
 		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965_Pad"
-			(at 172.72 151.13 0)
+			(at 172.72 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -14052,7 +14501,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 172.72 151.13 0)
+			(at 172.72 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -14063,7 +14512,7 @@
 			)
 		)
 		(property "Description" "Mounting Hole with connection"
-			(at 172.72 151.13 0)
+			(at 172.72 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -15006,7 +15455,7 @@
 	)
 	(symbol
 		(lib_id "Mechanical:MountingHole_Pad")
-		(at 162.56 151.13 0)
+		(at 162.56 153.67 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -15017,7 +15466,7 @@
 		(fields_autoplaced yes)
 		(uuid "4f4011b9-0d8e-4a77-9ada-a83f5e1f3124")
 		(property "Reference" "H1"
-			(at 165.1 148.5899 0)
+			(at 165.1 151.1299 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -15028,7 +15477,7 @@
 			)
 		)
 		(property "Value" "MountingHole_Pad"
-			(at 165.1 151.1299 0)
+			(at 165.1 153.6699 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -15040,7 +15489,7 @@
 			)
 		)
 		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965_Pad"
-			(at 162.56 151.13 0)
+			(at 162.56 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -15051,7 +15500,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 162.56 151.13 0)
+			(at 162.56 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -15062,7 +15511,7 @@
 			)
 		)
 		(property "Description" "Mounting Hole with connection"
-			(at 162.56 151.13 0)
+			(at 162.56 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -16512,7 +16961,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 170.18 153.67 0)
+		(at 170.18 156.21 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -16520,10 +16969,9 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "702298f4-1f3d-4656-bb4c-5e8eb0094bc0")
 		(property "Reference" "#PWR027"
-			(at 170.18 160.02 0)
+			(at 170.18 162.56 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -16534,7 +16982,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 170.18 158.75 0)
+			(at 166.116 159.004 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -16544,7 +16992,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 170.18 153.67 0)
+			(at 170.18 156.21 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -16555,7 +17003,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 170.18 153.67 0)
+			(at 170.18 156.21 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -16566,7 +17014,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 170.18 153.67 0)
+			(at 170.18 156.21 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -16853,6 +17301,161 @@
 			(project "BatteryMonitorModule"
 				(path "/03269402-9c05-492f-98b8-b4c760268d66"
 					(reference "C3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Mechanical:Fiducial")
+		(at 185.42 128.27 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "7889edc2-4fd0-4743-aa62-9c5ec29771ac")
+		(property "Reference" "FID3"
+			(at 187.96 126.9999 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "Fiducial"
+			(at 187.96 129.5399 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Fiducial:Fiducial_0.5mm_Mask1.5mm"
+			(at 185.42 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 185.42 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Fiducial Marker"
+			(at 185.42 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "BatteryMonitorModule"
+				(path "/03269402-9c05-492f-98b8-b4c760268d66"
+					(reference "FID3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 110.49 125.73 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "7918941b-0740-4d06-aa51-8e0e9b10530e")
+		(property "Reference" "#PWR022"
+			(at 116.84 125.73 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 114.3 125.7299 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 110.49 125.73 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 110.49 125.73 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 110.49 125.73 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "d1614a27-1e2b-4c97-beb4-2696d3821244")
+		)
+		(instances
+			(project "BatteryMonitorModule"
+				(path "/03269402-9c05-492f-98b8-b4c760268d66"
+					(reference "#PWR022")
 					(unit 1)
 				)
 			)
@@ -18168,6 +18771,82 @@
 		)
 	)
 	(symbol
+		(lib_id "Mechanical:Fiducial")
+		(at 185.42 123.19 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "9cf801a2-3832-4d4c-aed2-ebaaa8343ab2")
+		(property "Reference" "FID2"
+			(at 187.96 121.9199 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Fiducial"
+			(at 187.96 124.4599 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Fiducial:Fiducial_0.5mm_Mask1.5mm"
+			(at 185.42 123.19 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 185.42 123.19 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Fiducial Marker"
+			(at 185.42 123.19 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "BatteryMonitorModule"
+				(path "/03269402-9c05-492f-98b8-b4c760268d66"
+					(reference "FID2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector:Screw_Terminal_01x01")
 		(at 22.86 33.02 180)
 		(unit 1)
@@ -18873,7 +19552,7 @@
 	)
 	(symbol
 		(lib_id "Mechanical:MountingHole_Pad")
-		(at 177.8 151.13 0)
+		(at 177.8 153.67 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -18884,7 +19563,7 @@
 		(fields_autoplaced yes)
 		(uuid "b15ba551-9615-49f9-b463-07be80bdf83c")
 		(property "Reference" "H4"
-			(at 180.34 148.5899 0)
+			(at 180.34 151.1299 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -18895,7 +19574,7 @@
 			)
 		)
 		(property "Value" "MountingHole_Pad"
-			(at 180.34 151.1299 0)
+			(at 180.34 153.6699 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -18907,7 +19586,7 @@
 			)
 		)
 		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_DIN965_Pad"
-			(at 177.8 151.13 0)
+			(at 177.8 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -18918,7 +19597,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 177.8 151.13 0)
+			(at 177.8 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -18929,7 +19608,7 @@
 			)
 		)
 		(property "Description" "Mounting Hole with connection"
-			(at 177.8 151.13 0)
+			(at 177.8 153.67 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)

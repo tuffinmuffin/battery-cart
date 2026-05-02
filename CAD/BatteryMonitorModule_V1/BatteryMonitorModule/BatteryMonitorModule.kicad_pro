@@ -74,6 +74,14 @@
           ""
         ],
         [
+          "hole_clearance|85415876|32329222|09f412ba-9f9d-484e-a5f6-cbcd1ee10fd2|5c51a712-8c51-4183-8790-a14a69359c56",
+          ""
+        ],
+        [
+          "hole_clearance|91215876|32329222|8bc4887b-344d-4c37-8fdd-a4a12df355c0|0f1c4ac3-b2fd-4847-bfd9-3754e1896db9",
+          ""
+        ],
+        [
           "lib_footprint_mismatch|48792961|36009934|ea229151-32f7-4b72-b587-1634e9ab8ae0|00000000-0000-0000-0000-000000000000",
           ""
         ],
@@ -544,7 +552,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "BatteryMonitor-Rev-/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "",
@@ -679,7 +687,7 @@
         "uuid": "03269402-9c05-492f-98b8-b4c760268d66"
       }
     ],
-    "used_designators": "H5-6",
+    "used_designators": "",
     "variants": []
   },
   "sheets": [
