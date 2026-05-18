@@ -44,12 +44,19 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user sources here
+    # TinyUSB device-mode CDC ACM stack
+    Core/Src/usb_descriptors.c
+    Middlewares/tinyusb/src/tusb.c
+    Middlewares/tinyusb/src/common/tusb_fifo.c
+    Middlewares/tinyusb/src/device/usbd.c
+    Middlewares/tinyusb/src/device/usbd_control.c
+    Middlewares/tinyusb/src/class/cdc/cdc_device.c
+    Middlewares/tinyusb/src/portable/st/stm32_fsdev/dcd_stm32_fsdev.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user defined include paths
+    Middlewares/tinyusb/src
 )
 
 # Add project symbols (macros)
@@ -65,4 +72,24 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
 
     # Add user defined libraries
+)
+
+# Post-build: emit raw .bin alongside the .elf for DFU upload
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/${CMAKE_PROJECT_NAME}.bin
+    COMMENT "Generating ${CMAKE_PROJECT_NAME}.bin"
+)
+
+# DFU flash target. Prerequisites: board in DFU mode (hold BOOT0, tap RESET).
+# After flash completes, tap RESET (without BOOT0) to exit DFU and run the new firmware.
+# Override STM32_PROGRAMMER_CLI via -DSTM32_PROGRAMMER_CLI=<path> if installed elsewhere.
+set(STM32_PROGRAMMER_CLI
+    "C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"
+    CACHE FILEPATH "Path to STM32_Programmer_CLI for DFU flashing"
+)
+add_custom_target(flash
+    COMMAND "${STM32_PROGRAMMER_CLI}" -c port=USB1 -w $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
+    DEPENDS ${CMAKE_PROJECT_NAME}
+    USES_TERMINAL
+    COMMENT "Flashing $<TARGET_FILE:${CMAKE_PROJECT_NAME}> via DFU..."
 )

@@ -22,6 +22,7 @@
 #include "stm32c0xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "tusb.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -126,7 +127,9 @@ void EXTI4_15_IRQHandler(void)
 void USB_DRD_FS_IRQHandler(void)
 {
   /* USER CODE BEGIN USB_DRD_FS_IRQn 0 */
-
+  /* TinyUSB owns the USB peripheral after tud_init(). Skip the HAL handler. */
+  tud_int_handler(0);
+  return;
   /* USER CODE END USB_DRD_FS_IRQn 0 */
   HAL_PCD_IRQHandler(&hpcd_USB_DRD_FS);
   /* USER CODE BEGIN USB_DRD_FS_IRQn 1 */

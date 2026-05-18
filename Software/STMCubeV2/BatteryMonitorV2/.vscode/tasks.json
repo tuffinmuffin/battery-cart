@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Flash (DFU)",
+            "type": "shell",
+            "command": "C:\\Program Files\\STMicroelectronics\\STM32Cube\\STM32CubeProgrammer\\bin\\STM32_Programmer_CLI.exe",
+            "args": [
+                "-c",
+                "port=USB1",
+                "-w",
+                "${workspaceFolder}/build/${command:cmake.buildType}/BatteryMonitorV2.elf"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "detail": "Flashes the active CMake Tools build (Debug or Release) via DFU. Prerequisites: (1) build first via the CMake Tools extension, (2) board in DFU mode (hold BOOT0, tap RESET). After flash completes, tap RESET (without BOOT0) to exit DFU and run the new firmware."
+        }
+    ]
+}

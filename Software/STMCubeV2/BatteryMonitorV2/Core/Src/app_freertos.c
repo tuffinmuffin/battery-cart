@@ -22,7 +22,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "main.h"
+#include "gpio.h"
+#include "tim.h"
+#include "tusb.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -42,7 +46,19 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+osThreadId_t usbDeviceTaskHandle;
+const osThreadAttr_t usbDeviceTask_attributes = {
+  .name = "usbd",
+  .priority = (osPriority_t) osPriorityAboveNormal,
+  .stack_size = 256 * 4
+};
 
+osThreadId_t telemetryTaskHandle;
+const osThreadAttr_t telemetryTask_attributes = {
+  .name = "telemetry",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 256 * 4
+};
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -54,7 +70,8 @@ const osThreadAttr_t defaultTask_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
+void StartUsbDeviceTask(void *argument);
+void StartTelemetryTask(void *argument);
 /* USER CODE END FunctionPrototypes */
 
 /**
@@ -86,7 +103,8 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+  usbDeviceTaskHandle = osThreadNew(StartUsbDeviceTask, NULL, &usbDeviceTask_attributes);
+  telemetryTaskHandle = osThreadNew(StartTelemetryTask, NULL, &telemetryTask_attributes);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -104,16 +122,56 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN defaultTask */
-  /* Infinite loop */
+  /* K1 disabled — drive low and leave it there */
+  HAL_GPIO_WritePin(GPIO_K1_GPIO_Port, GPIO_K1_Pin, GPIO_PIN_RESET);
+
+  /* FAN_PWM (TIM1_CH4) at full duty — CCR = ARR is effectively 100% */
+  // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, htim1.Init.Period);
+  // HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+
+  /* Infinite loop — toggle MCU_LED at 1 Hz (500 ms half-period) */
   for(;;)
   {
-    osDelay(1);
+    HAL_GPIO_TogglePin(MCU_LED_GPIO_Port, MCU_LED_Pin);
+    osDelay(500);
   }
   /* USER CODE END defaultTask */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+/* TinyUSB device task — initializes the stack then drives event processing.
+ * tud_task() blocks on TinyUSB's FreeRTOS queue until the USB IRQ posts work. */
+void StartUsbDeviceTask(void *argument)
+{
+  (void)argument;
+  tud_init(0);
+  for(;;)
+  {
+    tud_task();
+  }
+}
+
+/* Telemetry task — emits a free-running ASCII counter at 1 Hz over CDC.
+ * Counter increments whether a host is connected or not; we only write when it is. */
+void StartTelemetryTask(void *argument)
+{
+  (void)argument;
+  uint32_t counter = 0;
+  char line[32];
+
+  for(;;)
+  {
+    int n = snprintf(line, sizeof(line), "tick %lu\r\n", (unsigned long)counter++);
+    if (tud_cdc_connected() && n > 0 && n < (int)sizeof(line))
+    {
+      tud_cdc_write(line, (uint32_t)n);
+      tud_cdc_write_flush();
+    }
+    osDelay(1000);
+  }
+}
 
 /* USER CODE END Application */
 
