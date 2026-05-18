@@ -13,6 +13,38 @@ sym-lib-table  text eol=lf
 # STM32CubeMX project files
 *.ioc          text eol=lf
 
+# Embedded firmware source — store as LF (kills CRLF noise on Windows checkouts)
+*.c            text eol=lf
+*.h            text eol=lf
+*.cpp          text eol=lf
+*.hpp          text eol=lf
+*.s            text eol=lf
+*.S            text eol=lf
+*.ld           text eol=lf
+*.cmake        text eol=lf
+CMakeLists.txt text eol=lf
+CMakePresets.json text eol=lf
+.clang-tidy    text eol=lf
+.clangd        text eol=lf
+
+# Build/config/data files
+*.json         text eol=lf
+*.yml          text eol=lf
+*.yaml         text eol=lf
+*.toml         text eol=lf
+*.md           text eol=lf
+*.txt          text eol=lf
+*.cfg          text eol=lf
+
+# Scripts (Unix-style line endings)
+*.py           text eol=lf
+*.sh           text eol=lf
+
+# Windows-specific scripts keep CRLF (cmd.exe / PowerShell-on-Win prefer it)
+*.ps1          text eol=crlf
+*.bat          text eol=crlf
+*.cmd          text eol=crlf
+
 # 3D CAD models — binary data
 *.step         binary
 *.STEP         binary
