@@ -86,6 +86,9 @@ def main() -> int:
     p.add_argument("--fix", action="store_true", help="apply --fix-errors")
     p.add_argument("--warnings-as-errors", action="store_true",
                    help="treat any warning as an error (CI mode)")
+    p.add_argument("--extra-arg", action="append", default=[],
+                   help="passed through to clang-tidy (repeatable). Useful for "
+                        "--extra-arg=-resource-dir=... when crossing toolchains.")
     args = p.parse_args()
 
     tidy = find_clang_tidy(args.tidy)
@@ -106,6 +109,8 @@ def main() -> int:
         cmd.append("--fix-errors")
     if args.warnings_as_errors:
         cmd.append("--warnings-as-errors=*")
+    for extra in args.extra_arg:
+        cmd.append(f"--extra-arg={extra}")
     cmd.extend(LINT_FILES)
 
     print(f"$ clang-tidy -p {build_dir} [{len(LINT_FILES)} files]")

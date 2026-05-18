@@ -111,8 +111,12 @@ jobs:
       - name: Add toolchain to PATH
         run: echo "/opt/llvm-arm/bin" >> $GITHUB_PATH
 
-      - name: Install ninja
-        run: sudo apt-get update && sudo apt-get install -y ninja-build
+      - name: Install ninja and clang-tidy
+        # ARM LLVM Embedded Toolchain ships clang/lld/llvm-* but NOT clang-tidy
+        # (it's a build-only distro). We install clang-tidy from apt and tell
+        # it via --extra-arg=-resource-dir below to use the ARM toolchain's
+        # picolibc headers when parsing arm-none-eabi sources.
+        run: sudo apt-get update && sudo apt-get install -y ninja-build clang-tidy
 
       - name: Patch linker script for ld.lld compatibility
         run: sed -i 's/ (READONLY)//g' STM32C071XX_FLASH.ld
@@ -121,4 +125,23 @@ jobs:
         run: cmake --preset ci-Debug
 
       - name: Run clang-tidy
-        run: python3 scripts/lint.py --build-dir build/ci-Debug --warnings-as-errors
+        # System clang-tidy (LLVM 18) provides the analyzer. Cross-compile
+        # awareness comes from passing every include dir ARM LLVM clang would
+        # use for cortex-m0plus as `--extra-arg=-isystem<dir>` so picolibc
+        # headers (inttypes.h, etc.) resolve correctly.
+        run: |
+          INCLUDES=$(/opt/llvm-arm/bin/clang --target=arm-none-eabi -mcpu=cortex-m0plus \
+                     -v -E -x c /dev/null 2>&1 | \
+                     awk '/<\.\.\.> search starts here:/{f=1;next} /End of search list/{f=0} f && /^ /' | \
+                     sed 's/^ *//')
+          EXTRA=""
+          for p in $INCLUDES; do
+            EXTRA="$EXTRA --extra-arg=-isystem$p"
+          done
+          echo "::group::cross-toolchain isystem dirs"
+          echo "$INCLUDES" | tr ' ' '\n'
+          echo "::endgroup::"
+          python3 scripts/lint.py \
+            --build-dir build/ci-Debug \
+            --warnings-as-errors \
+            $EXTRA
