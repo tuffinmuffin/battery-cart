@@ -34,6 +34,8 @@ Checks: >
   -misc-include-cleaner,
   -misc-no-recursion,
   -misc-unused-parameters,
+  -misc-use-internal-linkage,
+  -performance-no-int-to-ptr,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
 
 # Justification:
@@ -43,6 +45,13 @@ Checks: >
 #   misc-include-cleaner                   — over-fires on transitively-included STM32 headers
 #   misc-no-recursion                      — common pattern in FreeRTOS callbacks
 #   misc-unused-parameters                 — we use `(void)argument;` idiom for task fns
+#   misc-use-internal-linkage              — CubeMX-generated task handles (defaultTaskHandle,
+#                                            etc.) live outside USER CODE blocks and can't be
+#                                            marked static without surviving regens. Apply
+#                                            static manually to OUR additions instead.
+#   performance-no-int-to-ptr              — STM32 HAL register macros (GPIOA, etc.) expand to
+#                                            ((GPIO_TypeDef*)0x50000000UL); int→ptr is the
+#                                            entire MMIO design here, not a smell.
 #   clang-analyzer-security.insecureAPI    — flags every snprintf; not actionable here
 
 # Don't report on STM HAL / CMSIS / FreeRTOS / TinyUSB transitively included from our code.
