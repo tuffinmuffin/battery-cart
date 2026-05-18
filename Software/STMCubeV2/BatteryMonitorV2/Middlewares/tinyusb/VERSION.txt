@@ -1,0 +1,2 @@
+TinyUSB 0.20.0 - vendored from https://github.com/hathach/tinyusb/releases/tag/0.20.0
+Trimmed to: src/{tusb.c,tusb.h,tusb_option.h} + src/{common,device,osal} + src/class/cdc + src/portable/st/stm32_fsdev
