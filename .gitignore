@@ -25,3 +25,13 @@ fp-info-cache
 Thumbs.db
 .DS_Store
 *.history
+
+# STM32CubeMX safety backups
+*.ioc.LOCAL_BACKUP
+*.ioc.BACKUP
+
+# Firmware build outputs (regenerate via CMake)
+Software/STMCubeV2/*/build/
+
+# Claude Code local state
+.claude/
