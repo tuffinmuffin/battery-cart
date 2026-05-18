@@ -2,9 +2,14 @@ name: firmware-build
 
 on:
   push:
-    branches: [main]
   pull_request:
     branches: [main]
+
+# Cancel an in-flight run when a newer commit is pushed to the same ref.
+# Also collapses the push-then-PR double-trigger to a single run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 defaults:
   run:
