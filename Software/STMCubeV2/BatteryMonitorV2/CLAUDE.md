@@ -112,3 +112,31 @@ python scripts/telemetry_check.py [COM7]                # auto-detects if port o
 ```
 
 [scripts/telemetry_check.py](scripts/telemetry_check.py) reads 5 s of telemetry and asserts the `tick N` counter is monotonic. Exit 0 = pass. Foundation for future regression tests (next pass will add a FreeRTOS+CLI command/response harness here).
+
+## Static analysis (clang-tidy)
+
+Configured via [.clang-tidy](.clang-tidy) at the firmware project root. Lints only the files we own or substantially modified (`Core/Src/app_freertos.c`, `Core/Src/usb_descriptors.c`, `Core/Src/stm32c0xx_it.c`) — CubeMX boilerplate, TinyUSB, FreeRTOS, and HAL are excluded by not listing them. Add files to `LINT_FILES` in [scripts/lint.py](scripts/lint.py) as they become eligible.
+
+**Install clang-tidy locally** (one-time per machine):
+
+| OS | Command |
+|---|---|
+| Windows | `winget install LLVM.LLVM` (or `choco install llvm`) — open a fresh terminal after install so PATH refreshes |
+| Linux | `sudo apt install clang-tidy` (Debian/Ubuntu), `sudo dnf install clang-tools-extra` (Fedora), `sudo pacman -S clang` (Arch) |
+| macOS | `brew install llvm` then add `$(brew --prefix llvm)/bin` to PATH |
+
+ST's `starm-clang` bundle does **not** include `clang-tidy`. Install one of the above.
+
+**Run lint:**
+
+```
+python scripts/lint.py                       # warnings as warnings
+python scripts/lint.py --warnings-as-errors  # CI mode
+python scripts/lint.py --fix                 # apply auto-fixes; review the diff after
+```
+
+Auto-discovers `compile_commands.json` from `build/Debug` → `build/ci-Debug` → `build/Release` → `build/ci-Release`. Run a CMake configure (CMake Tools build button) first so one exists.
+
+**VS Code tasks:** "Lint (clang-tidy)" and "Lint (clang-tidy) --fix" in [.vscode/tasks.json](.vscode/tasks.json). The non-fix task uses a problem matcher so warnings land in the Problems panel as clickable references.
+
+**CI:** the `lint` job in [.github/workflows/firmware-build.yml](../../../.github/workflows/firmware-build.yml) runs the same script with `--warnings-as-errors`. Fails the build on any warning.

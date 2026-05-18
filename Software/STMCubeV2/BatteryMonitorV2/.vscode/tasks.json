@@ -22,6 +22,62 @@
                 "clear": true
             },
             "detail": "Flashes the active CMake Tools build (Debug or Release) via DFU. Prerequisites: (1) build first via the CMake Tools extension, (2) board in DFU mode (hold BOOT0, tap RESET). After flash completes, tap RESET (without BOOT0) to exit DFU and run the new firmware."
+        },
+        {
+            "label": "Lint (clang-tidy)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/scripts/lint.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": [
+                {
+                    "owner": "clang-tidy",
+                    "fileLocation": [
+                        "relative",
+                        "${workspaceFolder}"
+                    ],
+                    "pattern": {
+                        "regexp": "^(.+):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*?)\\s+\\[([\\w.-]+)\\]$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "severity": 4,
+                        "message": 5,
+                        "code": 6
+                    }
+                }
+            ],
+            "detail": "Runs clang-tidy on hand-written embedded C. Requires clang-tidy on PATH (see CLAUDE.md for install per OS). Uses compile_commands.json from build/Debug or fallback build dir. Add --fix to auto-correct where safe."
+        },
+        {
+            "label": "Lint (clang-tidy) --fix",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/scripts/lint.py",
+                "--fix"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": [],
+            "detail": "Same as Lint, but applies clang-tidy auto-fixes. Review the diff after."
         }
     ]
 }
