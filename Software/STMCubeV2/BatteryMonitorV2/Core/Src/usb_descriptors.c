@@ -18,7 +18,7 @@
 
 /* --------------- Device Descriptor --------------- */
 
-tusb_desc_device_t const desc_device = {
+static tusb_desc_device_t const desc_device = {
     .bLength            = sizeof(tusb_desc_device_t),
     .bDescriptorType    = TUSB_DESC_DEVICE,
     .bcdUSB             = USB_BCD,
@@ -56,7 +56,7 @@ enum {
 #define EPNUM_CDC_OUT       0x02    /* OUT bulk      — host -> device data   */
 #define EPNUM_CDC_IN        0x82    /* IN  bulk      — device -> host data   */
 
-uint8_t const desc_fs_configuration[] = {
+static uint8_t const desc_fs_configuration[] = {
     /* Config: bNumInterfaces, bConfigValue, iConfig, attributes, max power(mA/2) */
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, 0x80, 100),
 
@@ -79,7 +79,7 @@ enum {
     STRID_CDC_INTERFACE
 };
 
-char const* string_desc_arr[] = {
+static char const* string_desc_arr[] = {
     (const char[]) { 0x09, 0x04 },  /* 0: supported language — English (0x0409) */
     "Raptacon3200",                        /* 1: Manufacturer */
     "BatteryMonitorV2",              /* 2: Product */
@@ -87,7 +87,7 @@ char const* string_desc_arr[] = {
     "BMV2 CDC"                       /* 4: CDC interface name */
 };
 
-static uint16_t _desc_str[32 + 1];
+static uint16_t desc_str[32 + 1];
 
 uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
     (void) langid;
@@ -95,21 +95,22 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
     size_t chr_count;
 
     if (index == STRID_LANGID) {
-        memcpy(&_desc_str[1], string_desc_arr[0], 2);
+        memcpy(&desc_str[1], string_desc_arr[0], 2);
         chr_count = 1;
     } else {
         if (index >= sizeof(string_desc_arr) / sizeof(string_desc_arr[0])) return NULL;
 
         const char* str = string_desc_arr[index];
         chr_count = strlen(str);
-        size_t const max_count = sizeof(_desc_str) / sizeof(_desc_str[0]) - 1;
+        size_t const max_count = sizeof(desc_str) / sizeof(desc_str[0]) - 1;
         if (chr_count > max_count) chr_count = max_count;
 
         for (size_t i = 0; i < chr_count; i++) {
-            _desc_str[1 + i] = str[i];
+            /* Cast through unsigned char so values >0x7F don't sign-extend into uint16_t. */
+            desc_str[1 + i] = (unsigned char)str[i];
         }
     }
 
-    _desc_str[0] = (TUSB_DESC_STRING << 8) | (uint16_t)(2 * chr_count + 2);
-    return _desc_str;
+    desc_str[0] = (TUSB_DESC_STRING << 8) | (uint16_t)(2 * chr_count + 2);
+    return desc_str;
 }

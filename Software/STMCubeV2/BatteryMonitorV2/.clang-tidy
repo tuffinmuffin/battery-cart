@@ -1,0 +1,61 @@
+---
+# clang-tidy config for hand-written embedded C in BatteryMonitorV2.
+#
+# Run locally:    python scripts/lint.py
+# Run in CI:      same script, called from .github/workflows/firmware-build.yml
+# VS Code task:   "Lint (clang-tidy)"
+#
+# Scope is controlled by the files passed to clang-tidy on the command line
+# (in scripts/lint.py). CubeMX-generated boilerplate, TinyUSB, FreeRTOS,
+# and HAL/CMSIS are intentionally excluded — we only lint what we authored
+# or substantially modified.
+#
+# Check selection rationale:
+#   bugprone-*           — real bug patterns, low false-positive rate
+#   cert-*               — CERT secure coding rules (C subset enforced via excludes)
+#   clang-analyzer-*     — deeper static analysis (memory, null deref, etc.)
+#   misc-*               — useful misc checks
+#   performance-*        — performance hints
+# Disabled checks below are too noisy or not applicable to embedded C with
+# CubeMX-managed code (justification next to each).
+
+Checks: >
+  -*,
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  misc-*,
+  performance-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-reserved-identifier,
+  -cert-err58-cpp,
+  -cert-oop54-cpp,
+  -cert-dcl21-cpp,
+  -misc-include-cleaner,
+  -misc-no-recursion,
+  -misc-unused-parameters,
+  -misc-use-internal-linkage,
+  -performance-no-int-to-ptr,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+
+# Justification:
+#   bugprone-easily-swappable-parameters   — too aggressive; flags every multi-arg fn
+#   bugprone-reserved-identifier           — HAL/CMSIS use __underscore extensively
+#   cert-err58-cpp / oop54-cpp / dcl21-cpp — C++-only rules
+#   misc-include-cleaner                   — over-fires on transitively-included STM32 headers
+#   misc-no-recursion                      — common pattern in FreeRTOS callbacks
+#   misc-unused-parameters                 — we use `(void)argument;` idiom for task fns
+#   misc-use-internal-linkage              — CubeMX-generated task handles (defaultTaskHandle,
+#                                            etc.) live outside USER CODE blocks and can't be
+#                                            marked static without surviving regens. Apply
+#                                            static manually to OUR additions instead.
+#   performance-no-int-to-ptr              — STM32 HAL register macros (GPIOA, etc.) expand to
+#                                            ((GPIO_TypeDef*)0x50000000UL); int→ptr is the
+#                                            entire MMIO design here, not a smell.
+#   clang-analyzer-security.insecureAPI    — flags every snprintf; not actionable here
+
+# Don't report on STM HAL / CMSIS / FreeRTOS / TinyUSB transitively included from our code.
+HeaderFilterRegex: ''
+
+FormatStyle: file
+WarningsAsErrors: ''
