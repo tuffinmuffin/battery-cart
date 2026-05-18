@@ -1,0 +1,71 @@
+name: firmware-build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+defaults:
+  run:
+    working-directory: Software/STMCubeV2/BatteryMonitorV2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [ci-Debug, ci-Release]
+
+    env:
+      LLVM_VERSION: 19.1.5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache ARM LLVM Embedded Toolchain
+        id: cache-llvm
+        uses: actions/cache@v4
+        with:
+          path: /opt/llvm-arm
+          key: llvm-arm-${{ env.LLVM_VERSION }}-linux-x86_64
+
+      - name: Install ARM LLVM Embedded Toolchain
+        if: steps.cache-llvm.outputs.cache-hit != 'true'
+        working-directory: /tmp
+        run: |
+          curl -sSL -o llvm-arm.tar.xz \
+            "https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm/releases/download/release-${LLVM_VERSION}/LLVM-ET-Arm-${LLVM_VERSION}-Linux-x86_64.tar.xz"
+          sudo mkdir -p /opt/llvm-arm
+          sudo tar -xJf llvm-arm.tar.xz -C /opt/llvm-arm --strip-components=1
+
+      - name: Add toolchain to PATH
+        run: echo "/opt/llvm-arm/bin" >> $GITHUB_PATH
+
+      - name: Install ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Toolchain version
+        run: clang --version
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+
+      - name: Memory budget check
+        run: python3 scripts/check_memory.py build/${{ matrix.preset }}/BatteryMonitorV2.elf --ram-limit 85 --flash-limit 85
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.preset }}
+          path: |
+            Software/STMCubeV2/BatteryMonitorV2/build/${{ matrix.preset }}/BatteryMonitorV2.elf
+            Software/STMCubeV2/BatteryMonitorV2/build/${{ matrix.preset }}/BatteryMonitorV2.bin
+            Software/STMCubeV2/BatteryMonitorV2/build/${{ matrix.preset }}/BatteryMonitorV2.map
+          retention-days: 30
+          if-no-files-found: error

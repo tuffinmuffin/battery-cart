@@ -23,6 +23,28 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
+        },
+        {
+            "name": "ci-default",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "toolchainFile": "${sourceDir}/cmake/arm-clang.cmake",
+            "cacheVariables": {}
+        },
+        {
+            "name": "ci-Debug",
+            "inherits": "ci-default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "ci-Release",
+            "inherits": "ci-default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
         }
     ],
     "buildPresets": [
@@ -33,6 +55,14 @@
         {
             "name": "Release",
             "configurePreset": "Release"
+        },
+        {
+            "name": "ci-Debug",
+            "configurePreset": "ci-Debug"
+        },
+        {
+            "name": "ci-Release",
+            "configurePreset": "ci-Release"
         }
     ]
 }
