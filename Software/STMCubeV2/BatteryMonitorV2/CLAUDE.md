@@ -117,26 +117,49 @@ python scripts/telemetry_check.py [COM7]                # auto-detects if port o
 
 Configured via [.clang-tidy](.clang-tidy) at the firmware project root. Lints only the files we own or substantially modified (`Core/Src/app_freertos.c`, `Core/Src/usb_descriptors.c`, `Core/Src/stm32c0xx_it.c`) — CubeMX boilerplate, TinyUSB, FreeRTOS, and HAL are excluded by not listing them. Add files to `LINT_FILES` in [scripts/lint.py](scripts/lint.py) as they become eligible.
 
-**Install clang-tidy locally** (one-time per machine):
+### Why WSL on Windows
 
-| OS | Command |
-|---|---|
-| Windows | `winget install LLVM.LLVM` (or `choco install llvm`) — open a fresh terminal after install so PATH refreshes |
-| Linux | `sudo apt install clang-tidy` (Debian/Ubuntu), `sudo dnf install clang-tools-extra` (Fedora), `sudo pacman -S clang` (Arch) |
-| macOS | `brew install llvm` then add `$(brew --prefix llvm)/bin` to PATH |
+ST's `starm-clang` bundle does **not** include `clang-tidy`, and native Windows clang-tidy (from winget/choco) can't cross-compile arm-none-eabi without the ARM LLVM headers. The local lint workflow mirrors CI exactly by running inside **WSL Ubuntu**: apt-installed `clang-tidy` as the analyzer + ARM LLVM Embedded Toolchain (downloaded to `/opt/llvm-arm`) for the picolibc/arm-none-eabi headers.
 
-ST's `starm-clang` bundle does **not** include `clang-tidy`. Install one of the above.
+### One-time setup
 
-**Run lint:**
+**Windows (via WSL Ubuntu):**
+```powershell
+scripts\setup-wsl.ps1
+```
+PowerShell wrapper around `wsl bash scripts/setup-wsl.sh` — handles path/quoting between PowerShell, `wsl`, and bash so callers don't have to. Installs apt packages (`clang-tidy ninja-build cmake python3 curl`) and downloads ARM LLVM Embedded Toolchain 19.1.5 to `/opt/llvm-arm`. ~5 minutes. Prompts for sudo password. Re-runnable, idempotent.
+
+If PowerShell execution policy blocks it:
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\setup-wsl.ps1
+```
+
+**Linux / macOS:**
+```
+sudo apt install clang-tidy ninja-build cmake python3 curl    # Debian/Ubuntu
+brew install llvm cmake ninja                                  # macOS
+# Then download ARM LLVM Embedded Toolchain to /opt/llvm-arm (see setup-wsl.sh
+# for the exact recipe — same URL / steps just without sudo apt).
+```
+
+### Run lint
+
+```powershell
+# Windows (PowerShell wrapper around the WSL invocation):
+scripts\run-lint.ps1                       # warnings as warnings
+scripts\run-lint.ps1 --warnings-as-errors  # CI mode
+scripts\run-lint.ps1 --fix                 # apply auto-fixes; review diff after
+```
 
 ```
-python scripts/lint.py                       # warnings as warnings
-python scripts/lint.py --warnings-as-errors  # CI mode
-python scripts/lint.py --fix                 # apply auto-fixes; review the diff after
+# Linux/macOS (direct):
+bash scripts/run-lint.sh [--fix | --warnings-as-errors]
 ```
 
-Auto-discovers `compile_commands.json` from `build/Debug` → `build/ci-Debug` → `build/Release` → `build/ci-Release`. Run a CMake configure (CMake Tools build button) first so one exists.
+[scripts/run-lint.sh](scripts/run-lint.sh) configures the `ci-Debug` preset to emit `compile_commands.json`, extracts ARM clang's implicit include paths via `-v -E`, passes each as `--extra-arg=-isystem<dir>`, then delegates to `scripts/lint.py`. Configure is skipped if `build/ci-Debug/compile_commands.json` is fresher than `CMakeLists.txt`/`CMakePresets.json`.
 
-**VS Code tasks:** "Lint (clang-tidy)" and "Lint (clang-tidy) --fix" in [.vscode/tasks.json](.vscode/tasks.json). The non-fix task uses a problem matcher so warnings land in the Problems panel as clickable references.
+### Integrations
 
-**CI:** the `lint` job in [.github/workflows/firmware-build.yml](../../../.github/workflows/firmware-build.yml) runs the same script with `--warnings-as-errors`. Fails the build on any warning.
+- **CMake targets:** `cmake --build build/<preset> --target lint` (or `lint-fix`). On Windows the target invokes `wsl bash scripts/run-lint.sh`; on Linux/macOS it runs directly. Shows up in the CMake Tools target dropdown.
+- **VS Code tasks:** "Lint (clang-tidy, WSL)" and "Lint (clang-tidy, WSL) --fix" in [.vscode/tasks.json](.vscode/tasks.json). The non-fix task has a problem matcher so warnings land in the Problems panel as clickable references.
+- **CI:** the `lint` job in [.github/workflows/firmware-build.yml](../../../.github/workflows/firmware-build.yml) runs essentially the same recipe (apt clang-tidy + extracted ARM include paths) with `--warnings-as-errors`. Fails the build on any warning.

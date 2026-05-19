@@ -93,3 +93,34 @@ add_custom_target(flash
     USES_TERMINAL
     COMMENT "Flashing $<TARGET_FILE:${CMAKE_PROJECT_NAME}> via DFU..."
 )
+
+# clang-tidy lint target. Runs scripts/run-lint.sh inside WSL on Windows,
+# or directly on Linux/macOS. Requires one-time setup: `wsl bash scripts/setup-wsl.sh`
+# (Windows) or installing clang-tidy + the ARM LLVM Embedded Toolchain.
+if(CMAKE_HOST_WIN32)
+    add_custom_target(lint
+        COMMAND powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-lint.ps1
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        USES_TERMINAL
+        COMMENT "Running clang-tidy via WSL..."
+    )
+    add_custom_target(lint-fix
+        COMMAND powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-lint.ps1 --fix
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        USES_TERMINAL
+        COMMENT "Running clang-tidy --fix via WSL..."
+    )
+else()
+    add_custom_target(lint
+        COMMAND bash scripts/run-lint.sh
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        USES_TERMINAL
+        COMMENT "Running clang-tidy..."
+    )
+    add_custom_target(lint-fix
+        COMMAND bash scripts/run-lint.sh --fix
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        USES_TERMINAL
+        COMMENT "Running clang-tidy --fix..."
+    )
+endif()
