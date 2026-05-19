@@ -232,7 +232,7 @@ Ceedling's [test/project.yml](test/project.yml) puts [test/support/](test/suppor
 3. If the module uses HAL functions not already stubbed, add the prototype to [test/support/main.h](test/support/main.h) (or a peer header) and the corresponding `#include "mock_*.h"` to the test file.
 4. If the module genuinely can't be host-tested (FreeRTOS task body, ISR forwarder, static descriptor tables), add it to `TEST_EXEMPT` in [scripts/check_tests.py](scripts/check_tests.py) **with a one-line reason** instead of step 2. The diff is reviewer-visible.
 
-**Test-coverage enforcement.** [scripts/check_tests.py](scripts/check_tests.py) asserts every entry in `LINT_FILES` either has a matching `test_<module>.c` or is in `TEST_EXEMPT`. CI runs it in the `test_unit` job before `ceedling gcov:all`, so a new module without a test fails the build immediately rather than silently disappearing from the Codecov report. Run locally with `python scripts/check_tests.py --list` to see the current manifest.
+**Test-coverage enforcement.** [scripts/check_tests.py](scripts/check_tests.py) asserts every entry in `LINT_FILES` either has a matching `test_<module>.c` or is in `TEST_EXEMPT`. CI runs it as the **last** step of the `test_unit` job — after the Codecov upload — so a missing test fails the job loudly without suppressing the coverage data for everything else. The HTML artifact and Codecov upload still publish first; the red status comes from this check. Run locally with `python scripts/check_tests.py --list` to see the current manifest.
 
 ## Coverage
 

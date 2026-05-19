@@ -152,13 +152,6 @@ jobs:
           ceedling version | head -3
           gcovr --version | head -1
 
-      - name: Check every hand-written .c has a test (or is exempt)
-        # Ceedling silently skips unlinked sources, so a new module with no
-        # test_X.c never reaches Codecov and the missing-coverage gap is
-        # invisible. This guard fails fast if anything in LINT_FILES lacks
-        # both a test file and a TEST_EXEMPT entry. See scripts/check_tests.py.
-        run: python3 scripts/check_tests.py
-
       - name: Run unit tests with coverage
         working-directory: Software/STMCubeV2/BatteryMonitorV2/test
         run: ceedling gcov:all
@@ -179,3 +172,12 @@ jobs:
           flags: unit-tests
           fail_ci_if_error: true
           verbose: true
+
+      - name: Check every hand-written .c has a test (or is exempt)
+        # Runs LAST so that failures here don't suppress the coverage data
+        # for everything that DOES have tests - the HTML artifact and the
+        # Codecov upload above still happen before this step trips the job
+        # red. Ceedling silently skips unlinked sources, so a new module
+        # with no test_X.c never reaches Codecov and the missing-coverage
+        # gap is invisible without this guard. See scripts/check_tests.py.
+        run: python3 scripts/check_tests.py
