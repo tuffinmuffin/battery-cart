@@ -171,14 +171,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-html
-          path: /tmp/ceedling-batterymonitorv2/artifacts/gcov/
+          path: /tmp/ceedling-batterymonitorv2/artifacts/gcov/gcovr/
           if-no-files-found: warn
           retention-days: 30
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: /tmp/ceedling-batterymonitorv2/artifacts/gcov/CoberturaCoverage.xml
+          files: /tmp/ceedling-batterymonitorv2/artifacts/gcov/gcovr/GcovCoverageCobertura.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
           flags: unit-tests
-          fail_ci_if_error: false
+          fail_ci_if_error: true
           verbose: true
