@@ -62,6 +62,7 @@
   :plugins:
     - :ignore
     - :callback
+    - :expect_any_args
   :treat_as:
     uint8:    HEX8
     uint16:   HEX16
@@ -77,6 +78,12 @@
         - -Wextra
         - -Wno-unused-function
         - -Wno-unused-parameter
+    :link:
+      :*:
+        # stack_measure.c uses pthread to run the function-under-test on a
+        # sentinel-filled stack. Link pthread into every test binary so any
+        # test can opt into the helper without ceremony.
+        - -pthread
 
 :plugins:
   :enabled:

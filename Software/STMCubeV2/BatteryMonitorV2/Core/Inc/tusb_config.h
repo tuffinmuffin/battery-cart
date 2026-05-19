@@ -33,7 +33,10 @@ extern "C" {
 /* CDC ACM (Virtual COM Port) */
 #define CFG_TUD_CDC               1
 #define CFG_TUD_CDC_RX_BUFSIZE    64
-#define CFG_TUD_CDC_TX_BUFSIZE    64
+/* 256 lets a multi-line diagnostic burst (banner + sample) queue without
+ * tud_cdc_write returning short and dropping bytes. The writer also loops
+ * defensively so even bigger bursts are safe. */
+#define CFG_TUD_CDC_TX_BUFSIZE    256
 #define CFG_TUD_CDC_EP_BUFSIZE    64
 
 /* All other device classes off */

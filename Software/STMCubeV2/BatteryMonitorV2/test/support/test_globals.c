@@ -5,6 +5,7 @@
 
 #include "main.h"
 #include "tim.h"
+#include "i2c.h"
 
 /* Unique `_id` per port so CMock's default pointer-arg memcmp distinguishes
  * one port from another. Values are arbitrary — just need to differ. */
@@ -18,3 +19,8 @@ GPIO_TypeDef FAN_PWM_GPIO_Port_storage    = {4};
  * so CMock's pointer-match against &htim1 works and direct_io can read
  * htim1.Init.Period if it wants to. */
 TIM_HandleTypeDef htim1 = {{0}};
+
+/* Same trick for the I2C handles. Distinct `_id` so CMock can tell hi2c1 and
+ * hi2c2 apart when matching pointer args. */
+I2C_HandleTypeDef hi2c1 = {5};
+I2C_HandleTypeDef hi2c2 = {6};

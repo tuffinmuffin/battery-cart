@@ -46,6 +46,9 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Application
     Core/Src/direct_io.c
+    Core/Src/i2c_bus.c
+    Core/Src/ina238.c
+    Core/Src/ina238_task.c
 
     # TinyUSB device-mode CDC ACM stack
     Core/Src/usb_descriptors.c
@@ -125,6 +128,15 @@ if(CMAKE_HOST_WIN32)
         USES_TERMINAL
         COMMENT "Running tests with coverage instrumentation via WSL..."
     )
+    # Per-task stack usage report from .su files + objdump call graph.
+    # Depends on the firmware target so .su / .elf are guaranteed present.
+    add_custom_target(stack_report
+        COMMAND python ${CMAKE_SOURCE_DIR}/scripts/stack_report.py --build-dir ${CMAKE_BINARY_DIR}
+        DEPENDS ${CMAKE_PROJECT_NAME}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        USES_TERMINAL
+        COMMENT "Estimating per-task stack usage..."
+    )
 else()
     add_custom_target(lint
         COMMAND bash scripts/run-lint.sh
@@ -149,5 +161,12 @@ else()
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         USES_TERMINAL
         COMMENT "Running tests with coverage instrumentation..."
+    )
+    add_custom_target(stack_report
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/stack_report.py --build-dir ${CMAKE_BINARY_DIR}
+        DEPENDS ${CMAKE_PROJECT_NAME}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        USES_TERMINAL
+        COMMENT "Estimating per-task stack usage..."
     )
 endif()

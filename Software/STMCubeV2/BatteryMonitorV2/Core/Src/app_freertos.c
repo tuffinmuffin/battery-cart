@@ -27,6 +27,8 @@
 #include "tim.h"
 #include "tusb.h"
 #include "direct_io.h"
+#include "i2c_bus.h"
+#include "ina238_task.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -86,7 +88,9 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
+  /* I2C1 is shared between INA238 and PN532 — i2c_bus owns the mutex + DMA
+   * completion semaphore, plus the HAL transfer-complete callbacks. */
+  i2c_bus_init();
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
@@ -106,6 +110,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_THREADS */
   usbDeviceTaskHandle = osThreadNew(StartUsbDeviceTask, NULL, &usbDeviceTask_attributes);
   telemetryTaskHandle = osThreadNew(StartTelemetryTask, NULL, &telemetryTask_attributes);
+  ina238_task_start();
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -127,12 +132,14 @@ void StartDefaultTask(void *argument)
   relay_disable();
   bleed_disable();
   fan_init();
-
+  fan_set_duty(50U);
   /* Heartbeat loop — toggle MCU_LED at 1 Hz (500 ms half-period). */
   for(;;)
   {
     led_toggle();
     osDelay(500);
+    fan_set_duty(50U);
+
   }
   /* USER CODE END defaultTask */
 }
@@ -152,8 +159,9 @@ void StartUsbDeviceTask(void *argument)
   }
 }
 
-/* Telemetry task — emits a free-running ASCII counter at 1 Hz over CDC.
- * Counter increments whether a host is connected or not; we only write when it is. */
+/* Telemetry task — emits a free-running ASCII counter once a minute over CDC.
+ * Counter increments whether a host is connected or not; we only write when it is.
+ * 60 s (was 1 s) keeps debug noise down while the INA238 bring-up log is in focus. */
 void StartTelemetryTask(void *argument)
 {
   (void)argument;
@@ -168,7 +176,7 @@ void StartTelemetryTask(void *argument)
       tud_cdc_write(line, (uint32_t)n);
       tud_cdc_write_flush();
     }
-    osDelay(1000);
+    osDelay(60000);
   }
 }
 
