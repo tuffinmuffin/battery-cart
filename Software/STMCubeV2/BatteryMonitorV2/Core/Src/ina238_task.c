@@ -10,18 +10,19 @@
  * silicon — probe() also accepts INA237. After a successful probe, the line
  * "ina238: probe OK dev_id=0xNNNN" reports which variant the chip actually
  * is so you can tell at a glance.
+ *
+ * All output goes through cdc_print — no local printf buffers in this task.
  */
 
 #include "ina238_task.h"
 
+#include "cdc_print.h"
 #include "cmsis_os2.h"
 #include "direct_io.h"    /* relay_enable/disable for load-test toggle */
 #include "i2c.h"          /* hi2c1 */
 #include "i2c_bus.h"      /* i2c_bus_scan */
 #include "ina238.h"
-#include "tusb.h"
 
-#include <stdio.h>
 #include <string.h>
 
 /* Board-specific config: see schematic. INA238 with A0=A1=GND → 0x40.
@@ -39,27 +40,6 @@ static const osThreadAttr_t s_task_attr = {
     .priority = (osPriority_t)osPriorityNormal,
     .stack_size = 256 * 4,
 };
-
-/* Write `len` bytes to USB-CDC, looping until all bytes are queued.
- * Without this loop, tud_cdc_write silently returns short when the TX FIFO
- * is full (rapid back-to-back writes can exceed CFG_TUD_CDC_TX_BUFSIZE),
- * dropping the tail of the write — including the \r\n line terminator. */
-static void cdc_write_line(const char *line, int len)
-{
-    if (!tud_cdc_connected() || len <= 0) {
-        return;
-    }
-    int written = 0;
-    while (written < len) {
-        uint32_t n = tud_cdc_write(line + written, (uint32_t)(len - written));
-        written += (int)n;
-        tud_cdc_write_flush();
-        if (written < len) {
-            /* FIFO full — yield so the USB device task can drain it. */
-            osDelay(1);
-        }
-    }
-}
 
 static void Ina238TaskBody(void *argument)
 {
@@ -79,14 +59,12 @@ static void Ina238TaskBody(void *argument)
         .adc_range_low = false, /* ±163.84 mV range — enough for 40 A on 4 mΩ */
     };
 
-    char line[160];  /* needs room for full scan list (worst-case ~120 chars) */
-    int n;
-
-    /* One-shot bus scan up front — if the INA238 is at a different address
-     * than expected, or the bus is wedged, this surfaces it immediately. */
-    (void)i2c_bus_scan(&hi2c1, line, sizeof(line));
-    cdc_write_line(line, (int)strlen(line));
-    cdc_write_line("\r\n", 2);
+    /* One-shot bus scan — i2c_bus_scan formats into a caller buffer; the
+     * only stack-resident buffer left in this task. Sized for the
+     * worst-case address list. */
+    char scan_buf[160];
+    (void)i2c_bus_scan(&hi2c1, scan_buf, sizeof(scan_buf));
+    cdc_printf("%s\r\n", scan_buf);
 
     /* Diagnostic raw reads of the ID registers — bypasses probe()'s value
      * checks and just shows whatever the device returned. Differentiates:
@@ -102,31 +80,24 @@ static void Ina238TaskBody(void *argument)
         &s_ina238, INA238_REG_MANUFACTURER_ID, &raw_mfg);
     ina238_status_t s_dev = ina238_read_reg16(
         &s_ina238, INA238_REG_DEVICE_ID, &raw_dev);
-    n = snprintf(line, sizeof(line),
-                 "ina238 raw: MFG[3E]=0x%04X(st=%d) DEV[3F]=0x%04X(st=%d)\r\n",
-                 (unsigned)raw_mfg, (int)s_mfg, (unsigned)raw_dev, (int)s_dev);
-    cdc_write_line(line, n);
+    cdc_printf("ina238 raw: MFG[3E]=0x%04X(st=%d) DEV[3F]=0x%04X(st=%d)\r\n",
+               (unsigned)raw_mfg, (int)s_mfg, (unsigned)raw_dev, (int)s_dev);
 
     /* Probe loop — retry on failure rather than wedging the task. The bus may
      * not be electrically settled at first boot. */
     int retry = 0;
     ina238_status_t st;
     while ((st = ina238_probe(&s_ina238, &cfg)) != INA238_OK) {
-        n = snprintf(line, sizeof(line),
-                     "ina238: probe failed st=%d at 0x%02X, retry %d\r\n",
-                     (int)st, (unsigned)cfg.i2c_addr_7bit, retry);
-        cdc_write_line(line, n);
+        cdc_printf("ina238: probe failed st=%d at 0x%02X, retry %d\r\n",
+                   (int)st, (unsigned)cfg.i2c_addr_7bit, retry);
         retry++;
         osDelay(1000);
     }
-    n = snprintf(line, sizeof(line),
-                 "ina238: probe OK dev_id=0x%04X\r\n",
-                 (unsigned)s_ina238.detected_device_id);
-    cdc_write_line(line, n);
+    cdc_printf("ina238: probe OK dev_id=0x%04X\r\n",
+               (unsigned)s_ina238.detected_device_id);
 
     if (ina238_configure(&s_ina238) != INA238_OK) {
-        n = snprintf(line, sizeof(line), "ina238: configure failed\r\n");
-        cdc_write_line(line, n);
+        cdc_printf("ina238: configure failed\r\n");
         /* fall through — registers may still be at reset defaults */
     }
 
@@ -142,12 +113,10 @@ static void Ina238TaskBody(void *argument)
         (void)ina238_read_reg16(&s_ina238, INA238_REG_ADC_CONFIG, &r_adc);
         (void)ina238_read_reg16(&s_ina238, INA238_REG_SHUNT_CAL, &r_cal);
         (void)ina238_read_reg16(&s_ina238, INA238_REG_DIAG_ALRT, &r_diag);
-        n = snprintf(line, sizeof(line),
-                     "ina238 regs: CONFIG=0x%04X ADC_CONFIG=0x%04X "
-                     "SHUNT_CAL=0x%04X DIAG_ALRT=0x%04X\r\n",
-                     (unsigned)r_cfg, (unsigned)r_adc,
-                     (unsigned)r_cal, (unsigned)r_diag);
-        cdc_write_line(line, n);
+        cdc_printf("ina238 regs: CONFIG=0x%04X ADC_CONFIG=0x%04X "
+                   "SHUNT_CAL=0x%04X DIAG_ALRT=0x%04X\r\n",
+                   (unsigned)r_cfg, (unsigned)r_adc,
+                   (unsigned)r_cal, (unsigned)r_diag);
     }
 
     /* Bring-up load test: log a few no-load samples, then close K1 so the
@@ -164,15 +133,13 @@ static void Ina238TaskBody(void *argument)
          * missed in CDC scrollback. */
         if (!k1_on) {
             if (loops < close_relay_at) {
-                n = snprintf(line, sizeof(line),
-                             "ina238: K1 closes in %lu samples\r\n",
-                             (unsigned long)(close_relay_at - loops));
-                cdc_write_line(line, n);
+                cdc_printf("ina238: K1 closes in %lu samples\r\n",
+                           (unsigned long)(close_relay_at - loops));
             } else {
                 /* Flank with separator lines so it's obvious in the log. */
-                cdc_write_line("====================================\r\n", 38);
-                cdc_write_line("ina238: K1 RELAY ENABLED (load test)\r\n", 38);
-                cdc_write_line("====================================\r\n", 38);
+                cdc_printf("====================================\r\n");
+                cdc_printf("ina238: K1 RELAY ENABLED (load test)\r\n");
+                cdc_printf("====================================\r\n");
                 relay_enable();
                 k1_on = true;
             }
@@ -204,21 +171,20 @@ static void Ina238TaskBody(void *argument)
         uint32_t stack_hwm_bytes = osThreadGetStackSpace(self);
 
         if (s1 == INA238_OK && s2 == INA238_OK && s3 == INA238_OK && s4 == INA238_OK) {
-            n = snprintf(line, sizeof(line),
-                         "ina238 K1=%s vshunt=0x%04X=%lduV vbus=0x%04X=%lumV i=%ldmA tdie=%ldmC stk_free=%luB\r\n",
-                         k1_on ? "ON " : "OFF",
-                         (unsigned)raw_vshunt, (long)vshunt_uv,
-                         (unsigned)raw_vbus,   (unsigned long)vbus_mv,
-                         (long)current_ma, (long)temp_mc,
-                         (unsigned long)stack_hwm_bytes);
+            cdc_printf("ina238 K1=%s vshunt=0x%04X=%lduV vbus=0x%04X=%lumV"
+                       " i=%ldmA tdie=%ldmC stk_free=%luB\r\n",
+                       k1_on ? "ON " : "OFF",
+                       (unsigned)raw_vshunt, (long)vshunt_uv,
+                       (unsigned)raw_vbus,   (unsigned long)vbus_mv,
+                       (long)current_ma, (long)temp_mc,
+                       (unsigned long)stack_hwm_bytes);
         } else {
-            n = snprintf(line, sizeof(line),
-                         "ina238 K1=%s read err: s1=%d s2=%d s3=%d s4=%d stk_free=%luB\r\n",
-                         k1_on ? "ON " : "OFF",
-                         s1, s2, s3, s4,
-                         (unsigned long)stack_hwm_bytes);
+            cdc_printf("ina238 K1=%s read err: s1=%d s2=%d s3=%d s4=%d"
+                       " stk_free=%luB\r\n",
+                       k1_on ? "ON " : "OFF",
+                       s1, s2, s3, s4,
+                       (unsigned long)stack_hwm_bytes);
         }
-        cdc_write_line(line, n);
 
         osDelay(1000);
     }

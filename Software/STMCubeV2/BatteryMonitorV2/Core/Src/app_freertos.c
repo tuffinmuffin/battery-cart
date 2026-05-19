@@ -26,6 +26,7 @@
 #include "gpio.h"
 #include "tim.h"
 #include "tusb.h"
+#include "cdc_print.h"
 #include "direct_io.h"
 #include "i2c_bus.h"
 #include "ina238_task.h"
@@ -88,6 +89,10 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
+  /* cdc_print owns a mutex-protected format buffer so any task can
+   * cdc_printf() (or plain printf) without its own scratch. Must come
+   * before any task that logs at startup. */
+  cdc_print_init();
   /* I2C1 is shared between INA238 and PN532 — i2c_bus owns the mutex + DMA
    * completion semaphore, plus the HAL transfer-complete callbacks. */
   i2c_bus_init();
@@ -160,22 +165,17 @@ void StartUsbDeviceTask(void *argument)
 }
 
 /* Telemetry task — emits a free-running ASCII counter once a minute over CDC.
- * Counter increments whether a host is connected or not; we only write when it is.
- * 60 s (was 1 s) keeps debug noise down while the INA238 bring-up log is in focus. */
+ * Counter increments whether a host is connected or not; cdc_printf drops
+ * the bytes silently when no host is listening. 60 s (was 1 s) keeps debug
+ * noise down while the INA238 bring-up log is in focus. */
 void StartTelemetryTask(void *argument)
 {
   (void)argument;
   uint32_t counter = 0;
-  char line[32];
 
   for(;;)
   {
-    int n = snprintf(line, sizeof(line), "tick %lu\r\n", (unsigned long)counter++);
-    if (tud_cdc_connected() && n > 0 && n < (int)sizeof(line))
-    {
-      tud_cdc_write(line, (uint32_t)n);
-      tud_cdc_write_flush();
-    }
+    cdc_printf("tick %lu\r\n", (unsigned long)counter++);
     osDelay(60000);
   }
 }

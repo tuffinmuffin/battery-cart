@@ -45,6 +45,7 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Application
+    Core/Src/cdc_print.c
     Core/Src/direct_io.c
     Core/Src/i2c_bus.c
     Core/Src/ina238.c

@@ -30,6 +30,7 @@ from pathlib import Path
 # files to lint coverage. Auto-generated CubeMX files are intentionally absent.
 LINT_FILES = [
     "Core/Src/app_freertos.c",
+    "Core/Src/cdc_print.c",
     "Core/Src/direct_io.c",
     "Core/Src/i2c_bus.c",
     "Core/Src/ina238.c",
