@@ -227,8 +227,12 @@ Ceedling's [test/project.yml](test/project.yml) puts [test/support/](test/suppor
 **Build root** is `test/build/` (in-project). We briefly tried `/tmp/` for a 5-7× speedup on WSL, but it broke `gcov`'s source-path resolution (`.gcda` records source paths relative to the build dir, and `/tmp/.../Core/Src/...` resolved nowhere) so the Cobertura XML came out empty and Codecov rejected it. Working coverage > faster runs — revisit via `-fprofile-prefix-map` if WSL fs perf becomes painful.
 
 **To add a new module under test:**
-1. Create `test/test_<module>.c` mirroring the pattern in `test_direct_io.c`. Ceedling auto-links the matching `Core/Src/<module>.c` by filename.
-2. If the module uses HAL functions not already stubbed, add the prototype to [test/support/main.h](test/support/main.h) (or a peer header) and the corresponding `#include "mock_*.h"` to the test file.
+1. Add the new `Core/Src/<module>.c` path to `LINT_FILES` in [scripts/lint.py](scripts/lint.py) (existing requirement for clang-tidy coverage).
+2. Create `test/test_<module>.c` mirroring the pattern in `test_direct_io.c`. Ceedling auto-links the matching `Core/Src/<module>.c` by filename.
+3. If the module uses HAL functions not already stubbed, add the prototype to [test/support/main.h](test/support/main.h) (or a peer header) and the corresponding `#include "mock_*.h"` to the test file.
+4. If the module genuinely can't be host-tested (FreeRTOS task body, ISR forwarder, static descriptor tables), add it to `TEST_EXEMPT` in [scripts/check_tests.py](scripts/check_tests.py) **with a one-line reason** instead of step 2. The diff is reviewer-visible.
+
+**Test-coverage enforcement.** [scripts/check_tests.py](scripts/check_tests.py) asserts every entry in `LINT_FILES` either has a matching `test_<module>.c` or is in `TEST_EXEMPT`. CI runs it in the `test_unit` job before `ceedling gcov:all`, so a new module without a test fails the build immediately rather than silently disappearing from the Codecov report. Run locally with `python scripts/check_tests.py --list` to see the current manifest.
 
 ## Coverage
 

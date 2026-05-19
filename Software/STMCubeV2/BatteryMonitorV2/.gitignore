@@ -9,3 +9,6 @@ STM32C071XX_FLASH.ld
 # gcov text reports — generated next to source by the coverage workflow.
 # Per-build .gcda/.gcno already live under build/ which is ignored above.
 *.gcov
+
+# Python bytecode cache from running scripts/ tools locally.
+scripts/__pycache__/
