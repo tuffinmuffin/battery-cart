@@ -62,14 +62,6 @@ TEST_EXEMPT: dict[str, str] = {
     "Core/Src/stm32c0xx_it.c": (
         "Thin ISR forwarders to HAL / TinyUSB. Behaviour is verified on hardware."
     ),
-    # TODO(tests): add test_cdc_print.c (mutex-protected printf path,
-    # early-boot no-mutex path, lock-failure path) and remove this entry.
-    # Carrying as exempt only so the check can land green; cdc_print.c HAS
-    # testable branching logic and should not stay here.
-    "Core/Src/cdc_print.c": (
-        "TODO: testable but no test_cdc_print.c yet - remove this entry "
-        "when the test lands."
-    ),
 }
 
 
@@ -132,7 +124,7 @@ def main() -> int:
     print("error: hand-written source files without a unit test:", file=sys.stderr)
     for src in missing:
         expected = _expected_test_path(src).relative_to(_firmware_root())
-        print(f"  {src}  →  expected {expected}", file=sys.stderr)
+        print(f"  {src}  -> expected {expected}", file=sys.stderr)
     print("", file=sys.stderr)
     print("Pick one:", file=sys.stderr)
     print("  1. Add a test at the expected path. See test/test_direct_io.c for", file=sys.stderr)
