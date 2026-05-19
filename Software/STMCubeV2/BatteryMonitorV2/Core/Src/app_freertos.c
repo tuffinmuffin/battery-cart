@@ -26,6 +26,7 @@
 #include "gpio.h"
 #include "tim.h"
 #include "tusb.h"
+#include "direct_io.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -122,17 +123,15 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN defaultTask */
-  /* K1 disabled — drive low and leave it there */
-  HAL_GPIO_WritePin(GPIO_K1_GPIO_Port, GPIO_K1_Pin, GPIO_PIN_RESET);
+  /* Safe boot state: relay + bleed off, fan PWM running at 0% duty. */
+  relay_disable();
+  bleed_disable();
+  fan_init();
 
-  /* FAN_PWM (TIM1_CH4) at full duty — CCR = ARR is effectively 100% */
-  // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, htim1.Init.Period);
-  // HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
-
-  /* Infinite loop — toggle MCU_LED at 1 Hz (500 ms half-period) */
+  /* Heartbeat loop — toggle MCU_LED at 1 Hz (500 ms half-period). */
   for(;;)
   {
-    HAL_GPIO_TogglePin(MCU_LED_GPIO_Port, MCU_LED_Pin);
+    led_toggle();
     osDelay(500);
   }
   /* USER CODE END defaultTask */

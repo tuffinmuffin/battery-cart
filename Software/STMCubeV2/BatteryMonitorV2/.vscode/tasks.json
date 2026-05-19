@@ -82,6 +82,51 @@
             },
             "problemMatcher": [],
             "detail": "Same as Lint, but applies clang-tidy auto-fixes. Review the diff after."
+        },
+        {
+            "label": "Unit tests (Ceedling, WSL)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy", "Bypass",
+                "-File", "${workspaceFolder}/scripts/run-tests.ps1"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": [],
+            "detail": "Runs host-side unit tests via Ceedling (Unity + CMock) inside WSL. Prereq: `wsl bash scripts/setup-wsl.sh` (which now also installs Ruby + Ceedling)."
+        },
+        {
+            "label": "Coverage (Ceedling gcov, WSL)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy", "Bypass",
+                "-File", "${workspaceFolder}/scripts/run-coverage.ps1"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": [],
+            "detail": "Runs unit tests with gcov instrumentation. Produces HTML coverage report + Cobertura XML (same files CI uploads to Codecov). HTML at test/build/artifacts/gcov/gcovr/GcovCoverageResults.html."
         }
     ]
 }
