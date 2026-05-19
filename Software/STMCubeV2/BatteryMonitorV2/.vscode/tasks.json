@@ -24,11 +24,13 @@
             "detail": "Flashes the active CMake Tools build (Debug or Release) via DFU. Prerequisites: (1) build first via the CMake Tools extension, (2) board in DFU mode (hold BOOT0, tap RESET). After flash completes, tap RESET (without BOOT0) to exit DFU and run the new firmware."
         },
         {
-            "label": "Lint (clang-tidy)",
+            "label": "Lint (clang-tidy, WSL)",
             "type": "shell",
-            "command": "python",
+            "command": "powershell",
             "args": [
-                "${workspaceFolder}/scripts/lint.py"
+                "-NoProfile",
+                "-ExecutionPolicy", "Bypass",
+                "-File", "${workspaceFolder}/scripts/run-lint.ps1"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -57,14 +59,16 @@
                     }
                 }
             ],
-            "detail": "Runs clang-tidy on hand-written embedded C. Requires clang-tidy on PATH (see CLAUDE.md for install per OS). Uses compile_commands.json from build/Debug or fallback build dir. Add --fix to auto-correct where safe."
+            "detail": "Runs clang-tidy on hand-written embedded C, via WSL Ubuntu. Prereq: one-time `wsl bash scripts/setup-wsl.sh`. Uses the same ARM LLVM Embedded Toolchain + apt clang-tidy as CI."
         },
         {
-            "label": "Lint (clang-tidy) --fix",
+            "label": "Lint (clang-tidy, WSL) --fix",
             "type": "shell",
-            "command": "python",
+            "command": "powershell",
             "args": [
-                "${workspaceFolder}/scripts/lint.py",
+                "-NoProfile",
+                "-ExecutionPolicy", "Bypass",
+                "-File", "${workspaceFolder}/scripts/run-lint.ps1",
                 "--fix"
             ],
             "options": {
