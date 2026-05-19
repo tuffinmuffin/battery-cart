@@ -44,6 +44,9 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    # Application
+    Core/Src/direct_io.c
+
     # TinyUSB device-mode CDC ACM stack
     Core/Src/usb_descriptors.c
     Middlewares/tinyusb/src/tusb.c
