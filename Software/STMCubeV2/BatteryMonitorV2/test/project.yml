@@ -17,7 +17,12 @@
   :use_test_preprocessor: :all
   :compile_threads: :auto
   :test_threads: :auto
-  :build_root: build/
+  # Build outside the project tree (and especially off the /mnt/c/ Windows
+  # bridge under WSL — that filesystem makes Ceedling's per-run dependency
+  # walk 3-4x slower). /tmp is tmpfs; cleared on WSL restart but a cold
+  # rebuild is still ~17s, vs ~40s when built inside the project tree.
+  # Override via $BUILD_ROOT in scripts/run-tests.sh if you need persistence.
+  :build_root: /tmp/ceedling-batterymonitorv2/
   :test_file_prefix: test_
   :default_tasks:
     - test:all
