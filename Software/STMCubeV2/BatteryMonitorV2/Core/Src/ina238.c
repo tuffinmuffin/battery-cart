@@ -239,7 +239,7 @@ ina238_status_t ina238_read_die_temp_mc(ina238_t *dev, int32_t *milli_celsius)
     /* Top 12 bits are signed °C, bottom 4 reserved. Arithmetic shift on a
      * signed value sign-extends; the compiler we use (gcc/clang) defines
      * this consistently. */
-    int16_t top12 = (int16_t)raw >> 4;
+    int16_t top12 = (int16_t)((int16_t)raw >> 4);
     *milli_celsius = (int32_t)top12 * (int32_t)INA238_DIETEMP_LSB_mC;
     return INA238_OK;
 }

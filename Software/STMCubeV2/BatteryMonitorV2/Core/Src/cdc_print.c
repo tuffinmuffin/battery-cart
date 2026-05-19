@@ -97,6 +97,7 @@ int cdc_printf(const char *fmt, ...)
  * symbol is only referenced through a libc weak alias. */
 
 __attribute__((used))
+/* NOLINTNEXTLINE(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp) -- picolibc retarget hook; name is mandated by libc. */
 int _write(int file, char *ptr, int len)
 {
     (void)file;
