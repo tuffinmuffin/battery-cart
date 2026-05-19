@@ -145,3 +145,22 @@ jobs:
             --build-dir build/ci-Debug \
             --warnings-as-errors \
             $EXTRA
+
+  test_unit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Software/STMCubeV2/BatteryMonitorV2
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Ruby + Ceedling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ruby ruby-dev build-essential
+          sudo gem install --no-document ceedling
+          ceedling version | head -3
+
+      - name: Run unit tests
+        run: bash scripts/run-tests.sh

@@ -15,13 +15,22 @@ set -euo pipefail
 LLVM_VERSION="${LLVM_VERSION:-19.1.5}"
 INSTALL_DIR="${INSTALL_DIR:-/opt/llvm-arm}"
 
-echo "==> [1/2] Installing apt packages (clang-tidy, cmake, ninja, python3, curl)"
+echo "==> [1/3] Installing apt packages (clang-tidy, cmake, ninja, python3, ruby, curl)"
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
-    build-essential clang-tidy ninja-build cmake python3 curl ca-certificates
+    build-essential clang-tidy ninja-build cmake python3 curl ca-certificates \
+    ruby ruby-dev gcc
 
 echo ""
-echo "==> [2/2] ARM LLVM Embedded Toolchain $LLVM_VERSION at $INSTALL_DIR"
+echo "==> [2/3] Installing Ceedling (Unity + CMock test framework)"
+if command -v ceedling >/dev/null 2>&1; then
+    echo "    already installed: $(ceedling version 2>&1 | head -1)"
+else
+    sudo gem install --no-document ceedling
+fi
+
+echo ""
+echo "==> [3/3] ARM LLVM Embedded Toolchain $LLVM_VERSION at $INSTALL_DIR"
 if [ -x "$INSTALL_DIR/bin/clang" ]; then
     echo "    already installed, skipping"
 else
@@ -39,10 +48,12 @@ echo ""
 echo "Verifying:"
 "$INSTALL_DIR/bin/clang" --version | head -1
 clang-tidy --version | head -1
+ceedling version 2>&1 | head -1 | sed 's/^/Ceedling /'
 
 echo ""
-echo "Setup complete. Run lint with:"
-echo "    wsl bash scripts/run-lint.sh"
+echo "Setup complete."
+echo "  Lint:        wsl bash scripts/run-lint.sh"
+echo "  Unit tests:  wsl bash scripts/run-tests.sh"
 echo ""
-echo "Or via CMake:  cmake --build build/ci-Debug --target lint"
-echo "Or VS Code:    Ctrl+Shift+P -> 'Tasks: Run Task' -> 'Lint (clang-tidy, WSL)'"
+echo "From CMake:    cmake --build build/Debug --target lint   (or --target test_unit)"
+echo "From VS Code:  Ctrl+Shift+P -> 'Tasks: Run Task'"

@@ -82,6 +82,30 @@
             },
             "problemMatcher": [],
             "detail": "Same as Lint, but applies clang-tidy auto-fixes. Review the diff after."
+        },
+        {
+            "label": "Unit tests (Ceedling, WSL)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy", "Bypass",
+                "-File", "${workspaceFolder}/scripts/run-tests.ps1"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": [],
+            "detail": "Runs host-side unit tests via Ceedling (Unity + CMock) inside WSL. Prereq: `wsl bash scripts/setup-wsl.sh` (which now also installs Ruby + Ceedling)."
         }
     ]
 }

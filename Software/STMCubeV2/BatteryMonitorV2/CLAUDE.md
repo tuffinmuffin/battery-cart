@@ -163,3 +163,40 @@ bash scripts/run-lint.sh [--fix | --warnings-as-errors]
 - **CMake targets:** `cmake --build build/<preset> --target lint` (or `lint-fix`). On Windows the target invokes `wsl bash scripts/run-lint.sh`; on Linux/macOS it runs directly. Shows up in the CMake Tools target dropdown.
 - **VS Code tasks:** "Lint (clang-tidy, WSL)" and "Lint (clang-tidy, WSL) --fix" in [.vscode/tasks.json](.vscode/tasks.json). The non-fix task has a problem matcher so warnings land in the Problems panel as clickable references.
 - **CI:** the `lint` job in [.github/workflows/firmware-build.yml](../../../.github/workflows/firmware-build.yml) runs essentially the same recipe (apt clang-tidy + extracted ARM include paths) with `--warnings-as-errors`. Fails the build on any warning.
+
+## Unit tests (Ceedling)
+
+Host-side unit tests with [Unity](https://www.throwtheswitch.org/unity) + [CMock](https://www.throwtheswitch.org/cmock) via [Ceedling](https://www.throwtheswitch.org/ceedling). Test sources live in [test/](test/); production code is compiled against host gcc with stub HAL headers from [test/support/](test/support/). CMock auto-generates mocks for `HAL_GPIO_WritePin`, `__HAL_TIM_SET_COMPARE`, etc. so tests assert which HAL the helper called with which args — no real hardware in the loop.
+
+**Install** (one-time): `wsl bash scripts/setup-wsl.sh` now also installs Ruby + the `ceedling` gem.
+
+**Run:**
+
+```powershell
+# Windows (via WSL):
+scripts\run-tests.ps1                  # all tests
+scripts\run-tests.ps1 test:direct_io   # just one test file
+scripts\run-tests.ps1 clobber          # nuke build/ artifacts
+```
+
+```
+# Linux/macOS:
+bash scripts/run-tests.sh [<ceedling args>]
+```
+
+**CMake target:** `cmake --build build/Debug --target test_unit` (Windows invokes the PowerShell wrapper; Linux/macOS calls bash directly). Visible in the CMake Tools target dropdown.
+
+**VS Code task:** "Unit tests (Ceedling, WSL)" in [.vscode/tasks.json](.vscode/tasks.json). Set as default for the test group, so Ctrl+Shift+P → "Tasks: Run Test Task" runs it.
+
+**CI:** `test_unit` job in [.github/workflows/firmware-build.yml](../../../.github/workflows/firmware-build.yml) — apt-installs Ruby, gem-installs ceedling, runs `bash scripts/run-tests.sh`.
+
+### How the test isolation works
+
+Ceedling's project.yml puts [test/support/](test/support/) at the front of the include path. So when `direct_io.c` does `#include "main.h"`, it picks up the **stub** [test/support/main.h](test/support/main.h) (a few HAL prototypes + pin defines as constants) instead of the real Core/Inc/main.h (which would drag in the entire CMSIS chain that doesn't parse with host gcc). Same trick for [test/support/tim.h](test/support/tim.h) — exposes `__HAL_TIM_SET_COMPARE`/`__HAL_TIM_GET_AUTORELOAD` as ordinary functions instead of HAL macros, so CMock can intercept them.
+
+`htim1` storage lives in [test/support/test_globals.c](test/support/test_globals.c). Port "pointers" (`MCU_LED_GPIO_Port`, etc.) are `#define`d as sentinel addresses — no linker symbol needed, CMock matches by value.
+
+When you add a new production module to test:
+1. Create `test/test_<module>.c` mirroring the pattern in `test_direct_io.c`.
+2. If the module uses HAL functions not already stubbed, add the prototype to `test/support/main.h` (or a peer header) and the corresponding `#include "mock_*.h"` to the test file.
+3. Add the module's `.c` to `:paths:source:` in `test/project.yml`.

@@ -1,0 +1,77 @@
+---
+# Ceedling project config for BatteryMonitorV2 host-side unit tests.
+#
+# Build artifacts land under test/build/ (gitignored). Tests run with the
+# host's native gcc — no cross-compile, no real HAL/CMSIS. Stub headers in
+# test/support/ stand in for the STM32 includes so we can mock HAL functions
+# with CMock.
+#
+# Invoke via:
+#   wsl bash scripts/run-tests.sh
+#   cmake --build build/Debug --target test_unit
+#   ceedling test:all              (direct, from inside test/)
+
+:project:
+  :use_exceptions: FALSE
+  :use_mocks: TRUE
+  :use_test_preprocessor: :all
+  :compile_threads: :auto
+  :test_threads: :auto
+  :build_root: build/
+  :test_file_prefix: test_
+  :default_tasks:
+    - test:all
+
+:paths:
+  :test:
+    - .
+  :source:
+    - ../Core/Src/
+  :include:
+    # Test-side stubs come FIRST so #include "main.h" / "tim.h" picks up
+    # our minimal mock-friendly versions instead of the real STM HAL/CMSIS.
+    - support/
+    - ../Core/Inc/
+  :support:
+    - support/
+
+# Ceedling auto-links the production source matching each test file's name
+# (test_direct_io.c -> direct_io.c). We don't need an explicit :files:
+# allow-list; the other Core/Src/*.c files never get pulled in unless
+# something includes them.
+
+:defines:
+  :common: &common_defines
+    - UNIT_TEST
+  :test:
+    - *common_defines
+  :test_preprocess:
+    - *common_defines
+
+:cmock:
+  :mock_prefix: mock_
+  :when_no_prototypes: :warn
+  :enforce_strict_ordering: TRUE
+  :plugins:
+    - :ignore
+    - :callback
+  :treat_as:
+    uint8:    HEX8
+    uint16:   HEX16
+    uint32:   UINT32
+    int8:     INT8
+    bool:     UINT8
+
+:flags:
+  :test:
+    :compile:
+      :*:
+        - -Wall
+        - -Wextra
+        - -Wno-unused-function
+        - -Wno-unused-parameter
+
+:plugins:
+  :enabled:
+    - report_tests_pretty_stdout
+...
