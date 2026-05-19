@@ -248,7 +248,22 @@ Outputs land at `test/build/artifacts/gcov/gcovr/`:
 **Integrations:**
 - **CMake target:** `cmake --build build/Debug --target test_coverage`.
 - **VS Code task:** "Coverage (Ceedling gcov, WSL)".
-- **CI:** the `test_unit` job runs `ceedling gcov:all`, uploads the HTML report as a PR artifact (30-day retention), and pushes the Cobertura XML to **Codecov**. Codecov then posts inline coverage comments on PRs showing which added/changed lines aren't covered by tests.
+- **CI:** the `test_unit` job runs `ceedling gcov:all`, uploads the HTML report as a PR artifact (30-day retention), and pushes the Cobertura XML to **Codecov**.
+
+### Viewing coverage on a PR
+
+Four ways the report surfaces, in increasing detail:
+
+1. **PR comment from the Codecov bot.** Appears within a minute of `test_unit` finishing. Shows project-vs-patch deltas and a per-file table with links into the dashboard. Click a filename to jump to that file's annotated source on app.codecov.io. Updates in place on each push.
+2. **`codecov/patch` status check** in the PR's checks list. Fails when patch coverage falls below the `patch.target` set in [.codecov.yml](../../../.codecov.yml) (currently 70%). The `codecov/project` check is informational — it logs project drift but doesn't block merge.
+3. **Inline annotations in "Files changed"** — uncovered new lines render with a ⚠ marker next to the diff, same UX as ESLint/clang-tidy annotations. Powered by `github_checks.annotations: true` in [.codecov.yml](../../../.codecov.yml). No per-reviewer setup required.
+4. **HTML report as a workflow artifact.** Actions run → `coverage-html` → download the zip and open `GcovCoverageResults.html` for a local browseable view with line-by-line gutters (what's covered, partial, uncovered, branch-uncovered). Useful when you want to dig into a function without round-tripping through the dashboard.
+
+**Dashboard:** [app.codecov.io/gh/tuffinmuffin/battery-cart](https://app.codecov.io/gh/tuffinmuffin/battery-cart) — sunburst, file tree, commit/PR history. The PR comment links here.
+
+**Optional — richer inline view via browser extension.** The Codecov GitHub Checks annotations only mark uncovered lines. If you want full red/green gutters overlaid on every line of the diff, install the [Codecov browser extension](https://github.com/codecov/sourcegraph-codecov) (Chrome/Firefox). It's per-developer; the server-side annotations work without it.
+
+**Codecov upload token** lives in repo secret `CODECOV_TOKEN`. The upload step has `fail_ci_if_error: true`, so a token rotation that isn't reflected in the secret will fail the `test_unit` job — rotate both ends together.
 
 ## Stack usage tracking
 

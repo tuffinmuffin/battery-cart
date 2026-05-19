@@ -1,0 +1,51 @@
+# Codecov config — repo root.
+#
+# Sets coverage targets for the firmware unit-test job and turns on
+# GitHub Checks annotations so uncovered new lines show ⚠ markers in
+# the PR "Files changed" tab (no per-reviewer browser extension required).
+#
+# After editing, push to a branch and check the CI run logs — Codecov's
+# uploader logs "Validating config…" and prints any schema errors. Bad
+# YAML here doesn't fail CI; Codecov just silently falls back to defaults.
+
+coverage:
+  # Color-coding range for the dashboard. Embedded code with HAL wrappers
+  # rarely reaches 90%+; tune the lower bound up as coverage grows.
+  range: "60...90"
+
+  status:
+    project:
+      default:
+        target: auto          # compare against the base commit
+        threshold: 1%         # allow ≤1pp dip — refactors that move code shouldn't fail
+        informational: true   # report only; don't block merge on project-wide drops
+    patch:
+      default:
+        target: 70%           # new/changed lines should be ≥70% covered
+        threshold: 0%
+        if_not_found: success # PRs that touch no trackable code pass
+
+# Inline annotations on the PR diff. This is the key knob that surfaces
+# coverage inside the code-review UI — Codecov posts the codecov/patch
+# check with per-line ⚠ markers on uncovered lines in "Files changed".
+github_checks:
+  annotations: true
+
+# PR comment layout. `files` expands the per-file breakdown so reviewers
+# can see which file dragged the patch number down without clicking through.
+comment:
+  layout: "header, diff, flags, components, files, footer"
+  behavior: default
+  require_changes: false      # always post, even when coverage is unchanged
+
+# Paths excluded from coverage tracking. gcovr already filters most of
+# these out of the Cobertura XML (see :gcov: :exclude: in
+# Software/STMCubeV2/BatteryMonitorV2/test/project.yml) — this list is
+# defense-in-depth so that if someone later adds a test pulling in
+# CubeMX-generated / vendored code, it doesn't contaminate the metric.
+ignore:
+  - "Software/STMCubeV2/BatteryMonitorV2/Drivers/**"          # STM32C0xx HAL + CMSIS
+  - "Software/STMCubeV2/BatteryMonitorV2/Middlewares/**"      # FreeRTOS + vendored TinyUSB
+  - "Software/STMCubeV2/BatteryMonitorV2/cmake/stm32cubemx/**"
+  - "Software/STMCubeV2/BatteryMonitorV2/test/**"             # tests themselves
+  - "Software/STMCubeV2/BatteryMonitorV2/build/**"            # any in-tree build outputs
