@@ -15,11 +15,11 @@ set -euo pipefail
 LLVM_VERSION="${LLVM_VERSION:-19.1.5}"
 INSTALL_DIR="${INSTALL_DIR:-/opt/llvm-arm}"
 
-echo "==> [1/3] Installing apt packages (clang-tidy, cmake, ninja, python3, ruby, curl)"
+echo "==> [1/3] Installing apt packages (clang-tidy, cmake, ninja, python3, ruby, gcovr, curl)"
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
     build-essential clang-tidy ninja-build cmake python3 curl ca-certificates \
-    ruby ruby-dev gcc
+    ruby ruby-dev gcc gcovr
 
 echo ""
 echo "==> [2/3] Installing Ceedling (Unity + CMock test framework)"

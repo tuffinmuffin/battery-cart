@@ -155,12 +155,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Ruby + Ceedling
+      - name: Install Ruby + Ceedling + gcovr
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ruby ruby-dev build-essential
+          sudo apt-get install -y --no-install-recommends ruby ruby-dev build-essential gcovr
           sudo gem install --no-document ceedling
           ceedling version | head -3
+          gcovr --version | head -1
 
-      - name: Run unit tests
-        run: bash scripts/run-tests.sh
+      - name: Run unit tests with coverage
+        working-directory: Software/STMCubeV2/BatteryMonitorV2/test
+        run: ceedling gcov:all
+
+      - name: Upload coverage report (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: /tmp/ceedling-batterymonitorv2/artifacts/gcov/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: /tmp/ceedling-batterymonitorv2/artifacts/gcov/CoberturaCoverage.xml
+          flags: unit-tests
+          fail_ci_if_error: false
+          verbose: true

@@ -79,4 +79,32 @@
 :plugins:
   :enabled:
     - report_tests_pretty_stdout
+    - gcov
+
+# gcov plugin configuration. `ceedling gcov:all` runs the tests with
+# coverage instrumentation and emits both an HTML report (for browsing
+# locally) and Cobertura XML (uploaded to Codecov by CI, which then
+# posts inline-on-the-diff comments in PRs).
+#
+# We exclude test scaffolding (Unity / CMock generated runners + mocks
+# + support/ stubs) from coverage so the metric reflects only our
+# production code under test.
+:gcov:
+  :utilities:
+    - gcovr
+  :reports:
+    - HtmlBasic
+    - Cobertura
+  :gcovr:
+    :report_root: ../
+    :branches: TRUE
+    :sort: uncovered-number
+    :exclude:
+      - '.*test.*'
+      - '.*support.*'
+      - '.*mock_.*'
+      - '.*Unity.*'
+      - '.*unity.*'
+      - '.*CMock.*'
+      - '.*cmock.*'
 ...

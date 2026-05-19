@@ -119,6 +119,12 @@ if(CMAKE_HOST_WIN32)
         USES_TERMINAL
         COMMENT "Running host-side unit tests via WSL (Ceedling)..."
     )
+    add_custom_target(test_coverage
+        COMMAND powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-coverage.ps1
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        USES_TERMINAL
+        COMMENT "Running tests with coverage instrumentation via WSL..."
+    )
 else()
     add_custom_target(lint
         COMMAND bash scripts/run-lint.sh
@@ -137,5 +143,11 @@ else()
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         USES_TERMINAL
         COMMENT "Running host-side unit tests (Ceedling)..."
+    )
+    add_custom_target(test_coverage
+        COMMAND bash scripts/run-coverage.sh
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        USES_TERMINAL
+        COMMENT "Running tests with coverage instrumentation..."
     )
 endif()
