@@ -154,6 +154,45 @@ standard names. */
 
 /* USER CODE BEGIN Defines */
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
+
+/* Trim unused FreeRTOS features — saves ~1 KB FLASH + ~1 KB RAM on this
+ * build (most of the dead code was already dropped by --gc-sections; what
+ * we recover here is the timer-service task body + its static stack
+ * reservation, plus the wrapper code in cmsis_os2.c that was force-linked
+ * because kernel init referenced it). None of these APIs are called
+ * anywhere in the project (no osTimerNew, osEventFlagsNew,
+ * osStreamBufferNew). CubeMX keeps writing these flags as `1` at the top
+ * of this file; we override here at the end of the header so the kernel
+ * sources (which gate their bodies on `#if configUSE_xxx == 1`) compile
+ * to nothing.
+ *
+ * Replacements when the features are eventually needed:
+ *   - Soft timers   → osDelay()-based tasks, or HW TIM + semaphore for
+ *                     hard-realtime, or a deadline tracked against
+ *                     osKernelGetTickCount() in a state-machine task.
+ *   - Event groups  → task notifications (configUSE_TASK_NOTIFICATIONS=1)
+ *                     or mutexes/semaphores.
+ *   - Stream buffers → plain queues for messages, or direct tud_cdc_read()
+ *                     for the future CDC shell. */
+#undef  configUSE_TIMERS
+#define configUSE_TIMERS                     0
+#undef  configUSE_OS2_TIMER
+#define configUSE_OS2_TIMER                  0
+#undef  INCLUDE_xTimerPendFunctionCall
+#define INCLUDE_xTimerPendFunctionCall       0
+
+#undef  configUSE_EVENT_GROUPS
+#define configUSE_EVENT_GROUPS               0
+/* CMSIS-RTOS2 wraps osEventFlagsSet/Clear from ISR using
+ * xTimerPendFunctionCall (which lives in timers.c). Disabling this flag
+ * removes the ISR-callable path so the timer dependency goes away. We
+ * never call event-flag APIs from ISRs anyway. */
+#undef  configUSE_OS2_EVENTFLAGS_FROM_ISR
+#define configUSE_OS2_EVENTFLAGS_FROM_ISR    0
+
+#undef  configUSE_STREAM_BUFFERS
+#define configUSE_STREAM_BUFFERS             0
+
 /* USER CODE END Defines */
 
 #endif /* __FREERTOS_CONFIG_H */
