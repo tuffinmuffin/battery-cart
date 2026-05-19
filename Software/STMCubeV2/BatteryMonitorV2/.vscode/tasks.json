@@ -126,7 +126,7 @@
                 "clear": true
             },
             "problemMatcher": [],
-            "detail": "Runs unit tests with gcov instrumentation. Produces HTML coverage report + Cobertura XML (same files CI uploads to Codecov). HTML is browsable at /tmp/ceedling-batterymonitorv2/artifacts/gcov/."
+            "detail": "Runs unit tests with gcov instrumentation. Produces HTML coverage report + Cobertura XML (same files CI uploads to Codecov). HTML at test/build/artifacts/gcov/gcovr/GcovCoverageResults.html."
         }
     ]
 }

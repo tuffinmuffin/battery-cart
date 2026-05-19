@@ -5,9 +5,8 @@
 # browser) and a Cobertura XML report (the format Codecov / GitHub PR
 # overlays consume).
 #
-# Outputs land under the Ceedling :build_root: (currently
-# /tmp/ceedling-batterymonitorv2/artifacts/gcov/). HTML browseable at:
-#     /tmp/ceedling-batterymonitorv2/artifacts/gcov/GcovCoverageResults.html
+# Outputs land under test/build/artifacts/gcov/gcovr/. HTML report at:
+#     test/build/artifacts/gcov/gcovr/GcovCoverageResults.html
 
 set -euo pipefail
 
@@ -24,7 +23,7 @@ cd test
 ceedling gcov:all
 
 # Surface the report locations after the run
-ARTIFACTS_DIR=/tmp/ceedling-batterymonitorv2/artifacts/gcov
+ARTIFACTS_DIR=test/build/artifacts/gcov/gcovr
 if [ -d "$ARTIFACTS_DIR" ]; then
     echo ""
     echo "Coverage artifacts:"

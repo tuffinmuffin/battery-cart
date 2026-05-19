@@ -17,12 +17,14 @@
   :use_test_preprocessor: :all
   :compile_threads: :auto
   :test_threads: :auto
-  # Build outside the project tree (and especially off the /mnt/c/ Windows
-  # bridge under WSL — that filesystem makes Ceedling's per-run dependency
-  # walk 3-4x slower). /tmp is tmpfs; cleared on WSL restart but a cold
-  # rebuild is still ~17s, vs ~40s when built inside the project tree.
-  # Override via $BUILD_ROOT in scripts/run-tests.sh if you need persistence.
-  :build_root: /tmp/ceedling-batterymonitorv2/
+  # Keep build_root inside the project tree. We tried /tmp/ for the WSL
+  # perf win (40s -> 7s), but gcov stores source paths in .gcda relative
+  # to the build location. With /tmp/ the relative `../Core/Src/...` no
+  # longer reaches the real source, gcovr can't load files, and the
+  # Cobertura XML comes out empty — Codecov rejects it. Working coverage
+  # is worth the slower runs. Re-explore via -fprofile-prefix-map or a
+  # symlink shim if WSL fs perf becomes a real pain point.
+  :build_root: build/
   :test_file_prefix: test_
   :default_tasks:
     - test:all

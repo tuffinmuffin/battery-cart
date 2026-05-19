@@ -224,7 +224,7 @@ scripts\run-tests.ps1 clobber          # nuke build artifacts
 
 Ceedling's [test/project.yml](test/project.yml) puts [test/support/](test/support/) at the front of the include path. When `direct_io.c` does `#include "main.h"`, it picks up the **stub** [test/support/main.h](test/support/main.h) (a few HAL prototypes + pin defines as constants) instead of the real Core/Inc/main.h (which would drag in the entire CMSIS chain that doesn't parse with host gcc). Same trick for [test/support/tim.h](test/support/tim.h) — exposes `__HAL_TIM_SET_COMPARE`/`__HAL_TIM_GET_AUTORELOAD` as ordinary functions instead of HAL macros, so CMock can intercept them. `htim1` storage lives in [test/support/test_globals.c](test/support/test_globals.c). Port "pointers" (`MCU_LED_GPIO_Port`, etc.) are real GPIO_TypeDef instances with unique `_id` values so CMock's default pointer-arg memcmp distinguishes them.
 
-**Build root** is `/tmp/ceedling-batterymonitorv2/` (WSL tmpfs), not under the project tree. Ceedling's per-run dependency walk over `/mnt/c/` is ~5-7× slower than `/tmp` — measured locally at 40 s → 6 s for a fully cached run.
+**Build root** is `test/build/` (in-project). We briefly tried `/tmp/` for a 5-7× speedup on WSL, but it broke `gcov`'s source-path resolution (`.gcda` records source paths relative to the build dir, and `/tmp/.../Core/Src/...` resolved nowhere) so the Cobertura XML came out empty and Codecov rejected it. Working coverage > faster runs — revisit via `-fprofile-prefix-map` if WSL fs perf becomes painful.
 
 **To add a new module under test:**
 1. Create `test/test_<module>.c` mirroring the pattern in `test_direct_io.c`. Ceedling auto-links the matching `Core/Src/<module>.c` by filename.
@@ -241,9 +241,9 @@ scripts\run-coverage.ps1          # Windows → WSL
 bash scripts/run-coverage.sh      # Linux / macOS / direct WSL shell
 ```
 
-Outputs land at `/tmp/ceedling-batterymonitorv2/artifacts/gcov/`:
-- `GcovCoverageResults.html` (+ subreports) — browsable in any browser
-- `CoberturaCoverage.xml` — Codecov / GitLab / Azure DevOps format
+Outputs land at `test/build/artifacts/gcov/gcovr/`:
+- `GcovCoverageResults.html` — browse in any browser
+- `GcovCoverageCobertura.xml` — Codecov / GitLab / Azure DevOps format
 
 **Integrations:**
 - **CMake target:** `cmake --build build/Debug --target test_coverage`.
