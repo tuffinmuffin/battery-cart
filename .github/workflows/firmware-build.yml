@@ -55,14 +55,6 @@ jobs:
       - name: Toolchain version
         run: clang --version
 
-      - name: Patch linker script for ld.lld compatibility
-        # ld.lld in ARM LLVM Embedded Toolchain 19.1.5 rejects the GNU ld
-        # `(READONLY)` section attribute that CubeMX-generated linker scripts use.
-        # The attribute is a hint; sections still land in FLASH via >FLASH.
-        # Local Windows builds (starm-clang/GNU ld) are unaffected — only the
-        # CI working tree is patched per run.
-        run: sed -i 's/ (READONLY)//g' STM32C071XX_FLASH.ld
-
       - name: Configure
         run: cmake --preset ${{ matrix.preset }}
 
@@ -117,9 +109,6 @@ jobs:
         # it via --extra-arg=-resource-dir below to use the ARM toolchain's
         # picolibc headers when parsing arm-none-eabi sources.
         run: sudo apt-get update && sudo apt-get install -y ninja-build clang-tidy
-
-      - name: Patch linker script for ld.lld compatibility
-        run: sed -i 's/ (READONLY)//g' STM32C071XX_FLASH.ld
 
       - name: Configure (for compile_commands.json)
         run: cmake --preset ci-Debug
