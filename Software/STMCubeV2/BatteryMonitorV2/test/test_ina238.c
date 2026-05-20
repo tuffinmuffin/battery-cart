@@ -31,12 +31,24 @@ static struct rx_response {
 } s_rx_queue[RX_QUEUE_DEPTH];
 static int s_rx_queue_filled;
 
+/* Per-test capture of writes - the mem_write_dma_cb stashes the byte buffer
+ * here so a test can assert the exact wire bytes (e.g. MSB-first packing). */
+#define WRITE_LOG_DEPTH 4
+static struct write_log_entry {
+    uint8_t  reg;
+    uint8_t  buf[3];
+    uint16_t len;
+} s_write_log[WRITE_LOG_DEPTH];
+static int s_write_log_filled;
+
 void setUp(void)
 {
     /* Reset the per-test rx queue so each test starts clean. CMock resets its
      * own call_count between tests, so call_count==0 selects s_rx_queue[0]. */
     memset(s_rx_queue, 0, sizeof(s_rx_queue));
     s_rx_queue_filled = 0;
+    memset(s_write_log, 0, sizeof(s_write_log));
+    s_write_log_filled = 0;
 }
 void tearDown(void) {}
 
@@ -117,6 +129,44 @@ static void expect_register_read(uint8_t reg, uint16_t value)
     i2c_bus_unlock_Expect();
     HAL_I2C_GetError_ExpectAndReturn(&hi2c1, HAL_I2C_ERROR_NONE);
     (void)reg; /* arg-matching is delegated to mem_read_dma_cb */
+}
+
+/* Capture-side analogue of mem_read_dma_cb. Records the write bytes so
+ * tests can assert MSB-first packing without writing a full byte-array
+ * matcher. The mock's return value is what mediates HAL success / failure;
+ * for that, set it via the subsequent ExpectAnyArgsAndReturn. */
+static HAL_StatusTypeDef mem_write_dma_cb(I2C_HandleTypeDef *hi2c,
+                                          uint16_t DevAddress,
+                                          uint16_t MemAddress,
+                                          uint16_t MemAddSize,
+                                          uint8_t *pData,
+                                          uint16_t Size,
+                                          int call_count)
+{
+    (void)hi2c; (void)DevAddress; (void)MemAddSize;
+    TEST_ASSERT_TRUE_MESSAGE(call_count < WRITE_LOG_DEPTH,
+        "write_log full; bump WRITE_LOG_DEPTH");
+    TEST_ASSERT_TRUE_MESSAGE(Size <= sizeof(s_write_log[0].buf),
+        "write payload larger than log entry");
+    s_write_log[call_count].reg = (uint8_t)MemAddress;
+    s_write_log[call_count].len = Size;
+    memcpy(s_write_log[call_count].buf, pData, Size);
+    s_write_log_filled = call_count + 1;
+    return HAL_OK;
+}
+
+/* Mirror of expect_register_read for the write side. Queues one
+ * lock → Mem_Write_DMA → wait_complete → unlock → GetError sequence
+ * with all calls succeeding. Tests that need a failure inject the
+ * sad-path expects directly. */
+static void expect_register_write_ok(void)
+{
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, true);
+    HAL_I2C_Mem_Write_DMA_AddCallback(mem_write_dma_cb);
+    HAL_I2C_Mem_Write_DMA_ExpectAnyArgsAndReturn(HAL_OK);
+    i2c_bus_wait_complete_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, true);
+    i2c_bus_unlock_Expect();
+    HAL_I2C_GetError_ExpectAndReturn(&hi2c1, HAL_I2C_ERROR_NONE);
 }
 
 static ina238_t s_dev;
@@ -271,6 +321,258 @@ void test_read_current_ma_uses_cached_current_lsb(void)
     int32_t ma = 0;
     TEST_ASSERT_EQUAL_INT(INA238_OK, ina238_read_current_ma(&s_dev, &ma));
     TEST_ASSERT_EQUAL_INT32(1220, ma);
+}
+
+void test_read_reg16_returns_hal_error_when_post_dma_error_flag_set(void)
+{
+    /* DMA wait succeeds but HAL_I2C_GetError reports a non-zero code
+     * (NACK, arbitration loss). The driver must surface that as ERR_HAL
+     * rather than swallowing it. Mirrors do_mem_read's final branch. */
+    seed_device();
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, true);
+    HAL_I2C_Mem_Read_DMA_ExpectAnyArgsAndReturn(HAL_OK);
+    i2c_bus_wait_complete_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, true);
+    i2c_bus_unlock_Expect();
+    HAL_I2C_GetError_ExpectAndReturn(&hi2c1, 1U /* HAL_I2C_ERROR_BERR */);
+
+    uint16_t value = 0;
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_HAL,
+        ina238_read_reg16(&s_dev, INA238_REG_VBUS, &value));
+}
+
+void test_read_reg24_assembles_three_bytes_big_endian(void)
+{
+    /* read_reg24 packs buf[0]<<16 | buf[1]<<8 | buf[2]. Use a sentinel
+     * pattern that would catch any byte-order swap. */
+    seed_device();
+    TEST_ASSERT_TRUE(s_rx_queue_filled < RX_QUEUE_DEPTH);
+    s_rx_queue[s_rx_queue_filled].buf[0] = 0x12U;
+    s_rx_queue[s_rx_queue_filled].buf[1] = 0x34U;
+    s_rx_queue[s_rx_queue_filled].buf[2] = 0x56U;
+    s_rx_queue[s_rx_queue_filled].len = 3;
+    s_rx_queue_filled++;
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, true);
+    HAL_I2C_Mem_Read_DMA_AddCallback(mem_read_dma_cb);
+    HAL_I2C_Mem_Read_DMA_ExpectAnyArgsAndReturn(HAL_OK);
+    i2c_bus_wait_complete_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, true);
+    i2c_bus_unlock_Expect();
+    HAL_I2C_GetError_ExpectAndReturn(&hi2c1, HAL_I2C_ERROR_NONE);
+
+    uint32_t value = 0;
+    TEST_ASSERT_EQUAL_INT(INA238_OK,
+        ina238_read_reg24(&s_dev, INA238_REG_POWER, &value));
+    TEST_ASSERT_EQUAL_UINT32(0x00123456UL, value);
+}
+
+void test_read_shunt_uv_positive_value(void)
+{
+    seed_device();
+    /* shunt_lsb_nv for RANGE0 = 5000 nV/LSB. Raw 0x0100 = 256 LSBs.
+     * 256 × 5000 nV = 1_280_000 nV → 1280 µV. */
+    expect_register_read(INA238_REG_VSHUNT, 0x0100U);
+
+    int32_t uv = 0;
+    TEST_ASSERT_EQUAL_INT(INA238_OK, ina238_read_shunt_uv(&s_dev, &uv));
+    TEST_ASSERT_EQUAL_INT32(1280, uv);
+}
+
+void test_read_shunt_uv_negative_value_sign_extends(void)
+{
+    seed_device();
+    /* -256 in 16-bit two's complement = 0xFF00. After sign-extension and
+     * scaling: -256 × 5000 nV / 1000 = -1280 µV. */
+    expect_register_read(INA238_REG_VSHUNT, 0xFF00U);
+
+    int32_t uv = 0;
+    TEST_ASSERT_EQUAL_INT(INA238_OK, ina238_read_shunt_uv(&s_dev, &uv));
+    TEST_ASSERT_EQUAL_INT32(-1280, uv);
+}
+
+/* ----- Write path ----- */
+
+void test_write_reg16_packs_msb_first_on_the_wire(void)
+{
+    seed_device();
+    expect_register_write_ok();
+
+    TEST_ASSERT_EQUAL_INT(INA238_OK,
+        ina238_write_reg16(&s_dev, INA238_REG_CONFIG, 0xABCDU));
+    TEST_ASSERT_EQUAL_INT(1, s_write_log_filled);
+    TEST_ASSERT_EQUAL_UINT8(INA238_REG_CONFIG, s_write_log[0].reg);
+    TEST_ASSERT_EQUAL_UINT16(2U, s_write_log[0].len);
+    TEST_ASSERT_EQUAL_UINT8(0xABU, s_write_log[0].buf[0]);
+    TEST_ASSERT_EQUAL_UINT8(0xCDU, s_write_log[0].buf[1]);
+}
+
+void test_write_reg16_returns_bus_busy_when_mutex_times_out(void)
+{
+    seed_device();
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, false);
+
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_BUS_BUSY,
+        ina238_write_reg16(&s_dev, INA238_REG_CONFIG, 0x0000U));
+}
+
+void test_write_reg16_unlocks_when_hal_kickoff_fails(void)
+{
+    seed_device();
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, true);
+    HAL_I2C_Mem_Write_DMA_ExpectAnyArgsAndReturn(HAL_ERROR);
+    i2c_bus_unlock_Expect();
+
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_HAL,
+        ina238_write_reg16(&s_dev, INA238_REG_CONFIG, 0x0000U));
+}
+
+void test_write_reg16_returns_dma_timeout_when_wait_fails(void)
+{
+    seed_device();
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, true);
+    HAL_I2C_Mem_Write_DMA_ExpectAnyArgsAndReturn(HAL_OK);
+    i2c_bus_wait_complete_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, false);
+    i2c_bus_unlock_Expect();
+
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_DMA_TIMEOUT,
+        ina238_write_reg16(&s_dev, INA238_REG_CONFIG, 0x0000U));
+}
+
+void test_write_reg16_returns_hal_error_when_post_dma_error_flag_set(void)
+{
+    /* Symmetric to the read-side post-DMA error case. */
+    seed_device();
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, true);
+    HAL_I2C_Mem_Write_DMA_ExpectAnyArgsAndReturn(HAL_OK);
+    i2c_bus_wait_complete_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, true);
+    i2c_bus_unlock_Expect();
+    HAL_I2C_GetError_ExpectAndReturn(&hi2c1, 1U /* HAL_I2C_ERROR_BERR */);
+
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_HAL,
+        ina238_write_reg16(&s_dev, INA238_REG_CONFIG, 0x0000U));
+}
+
+/* ----- Configure / reset ----- */
+
+void test_configure_writes_config_then_shunt_cal(void)
+{
+    seed_device();
+    /* Two writes in order: CONFIG then SHUNT_CAL. With adc_range_low=false,
+     * CONFIG = 0; SHUNT_CAL for the board defaults = 4000 (hand-verified
+     * by test_shunt_cal_for_board_defaults_4mOhm_40A_range0). */
+    expect_register_write_ok();
+    expect_register_write_ok();
+
+    TEST_ASSERT_EQUAL_INT(INA238_OK, ina238_configure(&s_dev));
+    TEST_ASSERT_EQUAL_INT(2, s_write_log_filled);
+
+    TEST_ASSERT_EQUAL_UINT8(INA238_REG_CONFIG, s_write_log[0].reg);
+    TEST_ASSERT_EQUAL_UINT8(0x00U, s_write_log[0].buf[0]);
+    TEST_ASSERT_EQUAL_UINT8(0x00U, s_write_log[0].buf[1]);
+
+    TEST_ASSERT_EQUAL_UINT8(INA238_REG_SHUNT_CAL, s_write_log[1].reg);
+    /* 4000 = 0x0FA0 → MSB 0x0F, LSB 0xA0. */
+    TEST_ASSERT_EQUAL_UINT8(0x0FU, s_write_log[1].buf[0]);
+    TEST_ASSERT_EQUAL_UINT8(0xA0U, s_write_log[1].buf[1]);
+}
+
+void test_configure_sets_adcrange_bit_when_adc_range_low_is_true(void)
+{
+    seed_device();
+    s_dev.cfg.adc_range_low = true;
+    s_dev.shunt_lsb_nv = INA238_VSHUNT_LSB_nV_RANGE1;
+    expect_register_write_ok();
+    expect_register_write_ok();
+
+    TEST_ASSERT_EQUAL_INT(INA238_OK, ina238_configure(&s_dev));
+    /* INA238_CONFIG_ADCRANGE bit must be set in the CONFIG write. */
+    uint16_t config_written =
+        ((uint16_t)s_write_log[0].buf[0] << 8) | s_write_log[0].buf[1];
+    TEST_ASSERT_EQUAL_UINT16(INA238_CONFIG_ADCRANGE,
+        config_written & INA238_CONFIG_ADCRANGE);
+}
+
+void test_configure_aborts_when_config_write_fails(void)
+{
+    /* If the CONFIG write fails the cal write must NOT happen - otherwise
+     * a cal value computed for ADCRANGE=1 could end up applied with
+     * ADCRANGE=0 latched, corrupting current readings by 4x. */
+    seed_device();
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, true);
+    HAL_I2C_Mem_Write_DMA_ExpectAnyArgsAndReturn(HAL_ERROR);
+    i2c_bus_unlock_Expect();
+    /* No second write expected. */
+
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_HAL, ina238_configure(&s_dev));
+}
+
+void test_reset_writes_config_rst_bit(void)
+{
+    seed_device();
+    expect_register_write_ok();
+
+    TEST_ASSERT_EQUAL_INT(INA238_OK, ina238_reset(&s_dev));
+    TEST_ASSERT_EQUAL_INT(1, s_write_log_filled);
+    TEST_ASSERT_EQUAL_UINT8(INA238_REG_CONFIG, s_write_log[0].reg);
+    uint16_t config_written =
+        ((uint16_t)s_write_log[0].buf[0] << 8) | s_write_log[0].buf[1];
+    TEST_ASSERT_EQUAL_UINT16(INA238_CONFIG_RST, config_written);
+}
+
+/* ----- Probe edge cases ----- */
+
+void test_probe_rejects_null_dev(void)
+{
+    const ina238_config_t cfg = {
+        .hi2c = &hi2c1, .i2c_addr_7bit = 0x40,
+        .shunt_micro_ohm = 4000U, .max_expected_current_ma = 40000U,
+        .adc_range_low = false,
+    };
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_HAL, ina238_probe(NULL, &cfg));
+}
+
+void test_probe_rejects_null_cfg(void)
+{
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_HAL, ina238_probe(&s_dev, NULL));
+}
+
+void test_probe_rejects_cfg_with_null_hi2c(void)
+{
+    const ina238_config_t cfg = {
+        .hi2c = NULL, .i2c_addr_7bit = 0x40,
+        .shunt_micro_ohm = 4000U, .max_expected_current_ma = 40000U,
+        .adc_range_low = false,
+    };
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_HAL, ina238_probe(&s_dev, &cfg));
+}
+
+void test_probe_propagates_bus_busy_from_mfg_id_read(void)
+{
+    /* When the manufacturer-ID read fails (e.g. bus locked elsewhere),
+     * probe must propagate the underlying status rather than coercing
+     * to BAD_ID - the caller can distinguish "wrong chip" from
+     * "transport broken" and retry accordingly. */
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, false);
+
+    const ina238_config_t cfg = {
+        .hi2c = &hi2c1, .i2c_addr_7bit = 0x40,
+        .shunt_micro_ohm = 4000U, .max_expected_current_ma = 40000U,
+        .adc_range_low = false,
+    };
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_BUS_BUSY, ina238_probe(&s_dev, &cfg));
+}
+
+void test_probe_propagates_bus_busy_from_dev_id_read(void)
+{
+    /* mfg-id read succeeds and validates; dev-id read then fails the
+     * second lock. Propagation must again return the transport error. */
+    expect_register_read(INA238_REG_MANUFACTURER_ID, INA238_MANUFACTURER_ID);
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, false);
+
+    const ina238_config_t cfg = {
+        .hi2c = &hi2c1, .i2c_addr_7bit = 0x40,
+        .shunt_micro_ohm = 4000U, .max_expected_current_ma = 40000U,
+        .adc_range_low = false,
+    };
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_BUS_BUSY, ina238_probe(&s_dev, &cfg));
 }
 
 /* ----- Stack high-water tracking -----
