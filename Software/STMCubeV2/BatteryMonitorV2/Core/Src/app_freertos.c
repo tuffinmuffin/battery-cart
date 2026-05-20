@@ -31,6 +31,7 @@
 #include "display_task.h"
 #include "i2c_bus.h"
 #include "ina238_task.h"
+#include "monitor_state.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -97,6 +98,9 @@ void MX_FREERTOS_Init(void) {
   /* I2C1 is shared between INA238 and PN532 — i2c_bus owns the mutex + DMA
    * completion semaphore, plus the HAL transfer-complete callbacks. */
   i2c_bus_init();
+  /* monitor_state owns a mutex-protected snapshot of the latest readings
+   * shared between the INA238 producer task and the display consumer task. */
+  monitor_state_init();
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */

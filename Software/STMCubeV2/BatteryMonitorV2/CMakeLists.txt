@@ -60,6 +60,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/i2c_bus.c
     Core/Src/ina238.c
     Core/Src/ina238_task.c
+    Core/Src/monitor_state.c
     Core/Src/ssd1306.c
     Core/Src/display_task.c
 
