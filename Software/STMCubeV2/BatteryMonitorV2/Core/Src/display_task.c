@@ -1,18 +1,26 @@
 /**
  * display_task.c — FreeRTOS task that drives the OLED render loop.
  *
- * After a one-shot probe + ssd1306_init at startup, the task sleeps
- * to a fixed 5 Hz cadence: pulls the latest monitor_state snapshot,
- * picks a status label and a view mode, and hands them to
- * display_render() which paints one full frame.
+ * TODO(replace): this whole module is a bring-up placeholder. The
+ * real render layer will be driven by the charge-state machine
+ * (status text + view selection + screen router) and consume real
+ * monitor_state values from the INA238 producer. Treat everything
+ * here as scaffolding: the init/retry, the 5 Hz cadence, the demo
+ * data injection, and the V/A toggle are all expected to be
+ * replaced wholesale once the real controller exists.
  *
- * TEMP (also marked inline near the loop): until the real charge-
- * state machine + INA238 producer wire up to monitor_state, the
- * task injects a sweep of fake vbus / current / k1 / bleed / fan /
- * temp values and rotates through three demo status labels every
- * 4 s so the layout exercises against realistic-shaped data on
- * hardware.
+ * Coverage: file-level excluded (GCOVR_EXCL_FILE below) and not in
+ * the test-required manifest. Don't add tests against this surface
+ * — the API will change.
+ *
+ * Current behaviour (for hardware bring-up only):
+ *   - one-shot ssd1306_init at startup with retry on failure
+ *   - 5 Hz render loop: monitor_state_get -> display_render
+ *   - demo block injects sweeping vbus/current/k1/bleed/fan/temp
+ *     and rotates 3 status labels every 4 s
  */
+
+/* GCOVR_EXCL_FILE — placeholder task body; see TODO above. */
 
 #include "display_task.h"
 

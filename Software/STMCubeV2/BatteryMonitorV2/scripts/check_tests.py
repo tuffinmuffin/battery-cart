@@ -69,11 +69,14 @@ TEST_EXEMPT: dict[str, str] = {
         "layout is still iterating. TODO: revisit when the SDL desktop "
         "sim lands and brings the u8g2-on-host build with it."
     ),
-    # Deliberately NOT in this exempt list (yet):
-    #   - Core/Src/display_task.c — pending PR review input on whether
-    #     to test the demo-cycle helpers in isolation or exempt as a
-    #     pure FreeRTOS task body. Failing check_tests.py on purpose
-    #     so reviewers see the decision.
+    "Core/Src/display_task.c": (
+        "Bring-up placeholder — see TODO(replace) in the file header. "
+        "Charge-state machine will own the render dispatch, demo data "
+        "injection goes away, init/retry will likely move to a higher-"
+        "level display init coordinator. Don't add tests against this "
+        "surface; the API will change. File-level excluded from coverage "
+        "too (GCOVR_EXCL_FILE)."
+    ),
 }
 
 
