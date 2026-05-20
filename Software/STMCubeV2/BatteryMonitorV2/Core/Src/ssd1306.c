@@ -51,13 +51,11 @@ static uint8_t u8x8_byte_stm32_hw_i2c(u8x8_t *u8x8, uint8_t msg,
             s_tx_len += arg_int;
             break;
 
+        /* No-op byte messages on this transport: I2C2 was already
+         * initialised by MX_I2C2_Init() in main, and the D/C# select
+         * lives in the I2C control byte (no dedicated pin to wiggle). */
         case U8X8_MSG_BYTE_INIT:
-            /* I2C2 peripheral was initialized by MX_I2C2_Init() in main. */
-            break;
-
         case U8X8_MSG_BYTE_SET_DC:
-            /* I2C displays carry the D/C# bit inside the control byte; the
-             * dedicated GPIO message is meaningless on this bus. */
             break;
 
         case U8X8_MSG_BYTE_START_TRANSFER:
@@ -109,17 +107,17 @@ static uint8_t u8x8_gpio_and_delay_stm32(u8x8_t *u8x8, uint8_t msg,
             osDelay(1);
             break;
 
+        /* Sub-microsecond delays are below our SysTick resolution, and
+         * the GPIO messages are no-ops on this I2C-only display (the
+         * module has its own RESET, and CS/DC/clock/data are I2C
+         * peripheral pins driven by HAL, not u8g2). */
         case U8X8_MSG_DELAY_100NANO:
         case U8X8_MSG_DELAY_NANO:
-            /* Sub-microsecond — far below our timing resolution. nop. */
-            break;
-
         case U8X8_MSG_GPIO_RESET:
         case U8X8_MSG_GPIO_CS:
         case U8X8_MSG_GPIO_DC:
         case U8X8_MSG_GPIO_I2C_CLOCK:
         case U8X8_MSG_GPIO_I2C_DATA:
-            /* I2C-only display — no dedicated reset/CS/DC pins wired. */
             break;
 
         default:
