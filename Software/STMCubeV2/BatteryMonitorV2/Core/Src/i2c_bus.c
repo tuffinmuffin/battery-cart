@@ -55,9 +55,10 @@ bool i2c_bus_lock(uint32_t timeout_ms)
 
 void i2c_bus_unlock(void)
 {
-    if (s_initialised) {
-        (void)osMutexRelease(s_bus_mutex);
+    if (!s_initialised) {
+        return;
     }
+    (void)osMutexRelease(s_bus_mutex);
 }
 
 bool i2c_bus_wait_complete(uint32_t timeout_ms)
@@ -82,42 +83,47 @@ bool i2c_bus_wait_complete(uint32_t timeout_ms)
 void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     (void)hi2c;
-    if (s_initialised) {
-        (void)osSemaphoreRelease(s_xfer_done);
+    if (!s_initialised) {
+        return;
     }
+    (void)osSemaphoreRelease(s_xfer_done);
 }
 
 void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     (void)hi2c;
-    if (s_initialised) {
-        (void)osSemaphoreRelease(s_xfer_done);
+    if (!s_initialised) {
+        return;
     }
+    (void)osSemaphoreRelease(s_xfer_done);
 }
 
 void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     (void)hi2c;
-    if (s_initialised) {
-        (void)osSemaphoreRelease(s_xfer_done);
+    if (!s_initialised) {
+        return;
     }
+    (void)osSemaphoreRelease(s_xfer_done);
 }
 
 void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     (void)hi2c;
-    if (s_initialised) {
-        (void)osSemaphoreRelease(s_xfer_done);
+    if (!s_initialised) {
+        return;
     }
+    (void)osSemaphoreRelease(s_xfer_done);
 }
 
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
 {
     (void)hi2c;
     /* Wake the waiting task; it will surface the failure via HAL_I2C_GetError(). */
-    if (s_initialised) {
-        (void)osSemaphoreRelease(s_xfer_done);
+    if (!s_initialised) {
+        return;
     }
+    (void)osSemaphoreRelease(s_xfer_done);
 }
 
 /* --- Bus scan ------------------------------------------------------------

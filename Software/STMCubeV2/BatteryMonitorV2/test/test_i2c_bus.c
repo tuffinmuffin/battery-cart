@@ -92,6 +92,57 @@ static void ensure_init(void)
     s_did_init = true;
 }
 
+/* ----- Pre-init guards -----
+ *
+ * i2c_bus.c keeps an `s_initialised` static that gates every public op
+ * plus the five HAL completion callbacks. These tests run before any
+ * ensure_init() call (Ceedling preserves source order, so they're
+ * placed first), with no mock expectations set - any RTOS call that
+ * leaked through the !s_initialised guard would fail with CMock's
+ * "unexpected call" error. The lock/wait variants return false; the
+ * void-returning ones simply do nothing.
+ */
+
+void test_lock_returns_false_before_init(void)
+{
+    TEST_ASSERT_FALSE(i2c_bus_lock(100U));
+}
+
+void test_unlock_is_noop_before_init(void)
+{
+    i2c_bus_unlock();
+}
+
+void test_wait_complete_returns_false_before_init(void)
+{
+    TEST_ASSERT_FALSE(i2c_bus_wait_complete(100U));
+}
+
+void test_mem_tx_callback_is_noop_before_init(void)
+{
+    HAL_I2C_MemTxCpltCallback(&hi2c1);
+}
+
+void test_mem_rx_callback_is_noop_before_init(void)
+{
+    HAL_I2C_MemRxCpltCallback(&hi2c1);
+}
+
+void test_master_tx_callback_is_noop_before_init(void)
+{
+    HAL_I2C_MasterTxCpltCallback(&hi2c1);
+}
+
+void test_master_rx_callback_is_noop_before_init(void)
+{
+    HAL_I2C_MasterRxCpltCallback(&hi2c1);
+}
+
+void test_error_callback_is_noop_before_init(void)
+{
+    HAL_I2C_ErrorCallback(&hi2c1);
+}
+
 void test_lock_calls_osMutexAcquire_with_timeout(void)
 {
     ensure_init();
