@@ -39,6 +39,10 @@
     # our minimal mock-friendly versions instead of the real STM HAL/CMSIS.
     - support/
     - ../Core/Inc/
+    # u8g2 header — pure portable C, host-buildable. ssd1306.{h,c} and
+    # its tests #include "u8g2.h" / "u8x8.h" for the message-id enums
+    # and the u8x8_t struct definition.
+    - ../Middlewares/u8g2/csrc/
   :support:
     - support/
 

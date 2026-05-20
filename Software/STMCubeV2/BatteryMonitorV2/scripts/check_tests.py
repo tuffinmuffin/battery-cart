@@ -62,6 +62,18 @@ TEST_EXEMPT: dict[str, str] = {
     "Core/Src/stm32c0xx_it.c": (
         "Thin ISR forwarders to HAL / TinyUSB. Behaviour is verified on hardware."
     ),
+    "Core/Src/display_render.c": (
+        "Pure draw layer on top of u8g2 primitives. Host-testable in "
+        "principle (install a recording byte callback against the real "
+        "u8g2 engine) but high scaffolding cost vs the value while the "
+        "layout is still iterating. TODO: revisit when the SDL desktop "
+        "sim lands and brings the u8g2-on-host build with it."
+    ),
+    # Deliberately NOT in this exempt list (yet):
+    #   - Core/Src/display_task.c — pending PR review input on whether
+    #     to test the demo-cycle helpers in isolation or exempt as a
+    #     pure FreeRTOS task body. Failing check_tests.py on purpose
+    #     so reviewers see the decision.
 }
 
 

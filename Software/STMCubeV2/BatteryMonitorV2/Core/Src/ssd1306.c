@@ -35,9 +35,14 @@ static size_t  s_tx_len;
 
 /* u8g2 byte callback — drives the I2C2 wire. arg_int is the byte count for
  * MSG_BYTE_SEND; arg_ptr points at the source bytes. Returns 1 on success,
- * 0 on protocol error (which u8g2 logs but otherwise tolerates). */
-static uint8_t u8x8_byte_stm32_hw_i2c(u8x8_t *u8x8, uint8_t msg,
-                                      uint8_t arg_int, void *arg_ptr)
+ * 0 on protocol error (which u8g2 logs but otherwise tolerates).
+ *
+ * Non-static (no symbol name change) so test_ssd1306.c can call it
+ * directly to exercise each switch case in isolation. Not declared
+ * in ssd1306.h — only u8g2 (via the setup constructor's function
+ * pointer) and the test file should reach in. */
+uint8_t u8x8_byte_stm32_hw_i2c(u8x8_t *u8x8, uint8_t msg,
+                               uint8_t arg_int, void *arg_ptr)
 {
     switch (msg) {
         case U8X8_MSG_BYTE_SEND:
@@ -84,9 +89,10 @@ static uint8_t u8x8_byte_stm32_hw_i2c(u8x8_t *u8x8, uint8_t msg,
 }
 
 /* u8g2 GPIO/delay callback — millisecond delays during init, no GPIOs to
- * wiggle (the module has its own reset; no D/C# pin on I2C). */
-static uint8_t u8x8_gpio_and_delay_stm32(u8x8_t *u8x8, uint8_t msg,
-                                         uint8_t arg_int, void *arg_ptr)
+ * wiggle (the module has its own reset; no D/C# pin on I2C).
+ * Non-static for the same test-access reason as the byte callback above. */
+uint8_t u8x8_gpio_and_delay_stm32(u8x8_t *u8x8, uint8_t msg,
+                                  uint8_t arg_int, void *arg_ptr)
 {
     (void)u8x8;
     (void)arg_ptr;
