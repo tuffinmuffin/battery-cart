@@ -89,13 +89,31 @@ echo "    bm_big_digits   <- 9x18B.bdf, glyphs: ' -./0-9'"
     "$BDF_DIR/9x18B.bdf"
 prepend_include "$OUT_DIR/bm_big_digits.c"
 
+# --- bm_state_label -----------------------------------------------------
+# Used for the headline status label ("Charging" / "No Batt" / "Trickle"
+# / etc.). Sized to visually match the bm_big_digits headline weight on
+# the right side of the panel — 15 px tall is ~83% of the 18 px digits,
+# close enough that the two halves don't look mismatched.
+# Glyphs: space(32), '%'(37), '-./0-9:'(45-58), 'A'-'Z'(65-90), 'a'-'z'(97-122).
+# Source: 9x15B  — bold mono 9x15.
+echo "    bm_state_label  <- 9x15B.bdf, glyphs: ' %-./0-9:A-Za-z'"
+"$BDFCONV" -v -f 1 -m '32,37,45-58,65-90,97-122' \
+    -n bm_state_label \
+    -o "$OUT_DIR/bm_state_label.c" \
+    "$BDF_DIR/9x15B.bdf"
+prepend_include "$OUT_DIR/bm_state_label.c"
+
 # --- bm_small_status ----------------------------------------------------
-# Used for the bottom status row ("K1:ON  BLD:OFF  T:34C  FAN:50%").
-# Glyphs: space(32), '%'(37), '-./0-9:'(45-58), 'A'-'Z'(65-90).
+# Used for the bottom tray (charge timer + K/B indicators) and the V/A
+# unit suffixes next to the big-digit reading.
+# Glyphs: space(32), '%'(37), '-./0-9:'(45-58), 'A'-'Z'(65-90), 'a'-'z'(97-122).
+# Lowercase included so labels like "Charging" / "No Batt" / "Trickle"
+# render correctly — earlier subset was uppercase-only and showed only
+# the first letter of each word.
 # Source: 5x7 — 5x7 fixed monospace. Fits ~25 chars across at 7 px tall,
 # leaves ~25 px headroom in the 32 px panel for the headline.
-echo "    bm_small_status <- 5x7.bdf, glyphs: ' %-./0-9:A-Z'"
-"$BDFCONV" -v -f 1 -m '32,37,45-58,65-90' \
+echo "    bm_small_status <- 5x7.bdf, glyphs: ' %-./0-9:A-Za-z'"
+"$BDFCONV" -v -f 1 -m '32,37,45-58,65-90,97-122' \
     -n bm_small_status \
     -o "$OUT_DIR/bm_small_status.c" \
     "$BDF_DIR/5x7.bdf"

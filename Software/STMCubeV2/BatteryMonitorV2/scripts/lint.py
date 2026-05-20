@@ -32,6 +32,7 @@ LINT_FILES = [
     "Core/Src/app_freertos.c",
     "Core/Src/cdc_print.c",
     "Core/Src/direct_io.c",
+    "Core/Src/display_render.c",
     "Core/Src/display_task.c",
     "Core/Src/i2c_bus.c",
     "Core/Src/ina238.c",

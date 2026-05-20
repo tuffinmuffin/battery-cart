@@ -6,10 +6,15 @@
  * glyph set or source BDF, edit the script and re-run.
  *
  * Glyph subsets (see build-fonts.sh for the exact -m maps):
- *   bm_big_digits   — '-./0-9' + space, 14 glyphs, 9x18 bold mono.
- *                     Headline V / A readout on the top half.
- *   bm_small_status — '%-./0-9:A-Z' + space, 42 glyphs, 5x7 fixed mono.
- *                     Bottom-row status (K1/BLD/T/FAN/state labels).
+ *   bm_big_digits   — '-./0-9' + space, 14 glyphs, 9x18B bold mono.
+ *                     Headline V / A readout on the top-right.
+ *   bm_state_label  — '%-./0-9:A-Za-z' + space, 68 glyphs, 9x15B bold mono.
+ *                     Headline status label on the top-left ("Charging",
+ *                     "No Batt", "Trickle", etc.). Sized to visually
+ *                     match bm_big_digits next to it.
+ *   bm_small_status — '%-./0-9:A-Za-z' + space, 68 glyphs, 5x7 fixed mono.
+ *                     Bottom tray (charge timer + K/B indicators) and the
+ *                     V/A unit suffixes next to the big-digit reading.
  */
 
 #ifndef BM_FONTS_H
@@ -22,6 +27,7 @@ extern "C" {
 #endif
 
 extern const uint8_t bm_big_digits[]   U8G2_FONT_SECTION("bm_big_digits");
+extern const uint8_t bm_state_label[]  U8G2_FONT_SECTION("bm_state_label");
 extern const uint8_t bm_small_status[] U8G2_FONT_SECTION("bm_small_status");
 
 #ifdef __cplusplus

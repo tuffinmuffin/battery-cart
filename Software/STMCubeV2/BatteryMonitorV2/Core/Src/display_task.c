@@ -23,7 +23,9 @@
 
 #include "cdc_print.h"
 #include "cmsis_os2.h"
+#include "display_render.h"
 #include "i2c.h"                /* &hi2c2 */
+#include "monitor_state.h"
 #include "ssd1306.h"
 #include "stm32c0xx_hal.h"      /* HAL_I2C_IsDeviceReady */
 
@@ -139,23 +141,54 @@ static void DisplayTaskBody(void *argument)
     u8g2_t *u8g2 = ssd1306_u8g2();
     uint32_t frame = 0U;
 
+    /* TEMP demo cycle: with the INA238 producer disabled the snapshot
+     * stays at zeros, so we inject a sweep here and rotate the status
+     * label every 4 s to exercise the layout against realistic text.
+     * The 5 Hz render rate means 20 frames == 4 s. Drop both this
+     * demo block and the cycle counter once a real charge-state
+     * machine starts feeding monitor_state. */
+    static const char *const kDemoLabels[] = {
+        "Charging",
+        "No Batt",
+        "Trickle",
+    };
+    /* Demo battery serials matched to each label — "No Batt" shows
+     * dashes because the NFC reader wouldn't have a tag to read.
+     * Replace with the real PN532 read result once that driver lands.
+     *
+     * Strings sized at 10 chars total ("S/N: " + 5 chars) so the slot
+     * stays comfortably clear of the F/K/B/heart tray on the right. */
+    static const char *const kDemoSerials[] = {
+        "S/N: AB12C",
+        "S/N: -----",
+        "S/N: AB12C",
+    };
+    const uint32_t cycle_frames = 20U;
+
     for (;;) {
-        u8g2_FirstPage(u8g2);
-        do {
-            /* Frame around the 128x32 panel — exposes column-offset bugs
-             * (SSD1116 / SH1106 quirks show as a 2 px shift on the right
-             * edge or wraparound). */
-            u8g2_DrawFrame(u8g2, 0, 0, 128, 32);
+        monitor_snapshot_t snap;
+        monitor_state_get(&snap);
 
-            /* Crosshair so we can eyeball the pixel grid. */
-            u8g2_DrawHLine(u8g2, 0, 16, 128);
-            u8g2_DrawVLine(u8g2, 64, 0, 32);
+        snap.vbus_mv      = 12000U + (frame % 300U) * 10U;          /* 12.00..14.99 V */
+        snap.current_ma   = (int32_t)((frame % 400U) * 25) - 2500;  /* -2.5 .. +7.5 A */
+        snap.k1_on        = ((frame / 25U) & 1U) != 0U;
+        snap.bleed_on     = ((frame / 50U) & 1U) != 0U;
+        snap.fan_duty_pct = (uint32_t)((frame * 2U) % 100U);
+        snap.tdie_mc      = 24000 + (int32_t)((frame % 200U) * 100);  /* 24..44 C */
 
-            /* 4x4 box sweeps left-to-right at y=22 — animation confirms
-             * the page-flush path runs each frame, not just at init. */
-            uint8_t bx = (uint8_t)((frame * 4U) % 124U);
-            u8g2_DrawBox(u8g2, bx, 22, 4, 4);
-        } while (u8g2_NextPage(u8g2));
+        const uint32_t cycle = frame / cycle_frames;
+        const size_t   nlbl  = sizeof(kDemoLabels) / sizeof(kDemoLabels[0]);
+        const char *label    = kDemoLabels [cycle % nlbl];
+        const char *serial   = kDemoSerials[cycle % nlbl];
+        const bool show_v    = (cycle & 1U) == 0U;
+
+        /* Render runs at 5 Hz (DISPLAY_TASK_FRAME_INTERVAL_MS=200 ms),
+         * so frame/5 gives whole seconds since the task started.
+         * Stand-in for a real charge-state-machine timer. */
+        const uint32_t charge_time_s =
+            frame / (1000U / DISPLAY_TASK_FRAME_INTERVAL_MS);
+
+        display_render(u8g2, label, charge_time_s, serial, show_v, &snap);
 
         frame++;
         osDelay(DISPLAY_TASK_FRAME_INTERVAL_MS);
