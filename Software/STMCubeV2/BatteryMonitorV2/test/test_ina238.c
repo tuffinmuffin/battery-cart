@@ -419,6 +419,21 @@ void test_read_reg24_assembles_three_bytes_big_endian(void)
     TEST_ASSERT_EQUAL_UINT32(0x00123456UL, value);
 }
 
+void test_read_reg24_propagates_failure_from_do_mem_read(void)
+{
+    /* read_reg24 has no production caller today (POWER is the only
+     * 24-bit register and the app doesn't read it yet) but its failure
+     * semantics must match read_reg16 so a future caller can rely on
+     * the same contract. Out-param stays untouched on the error path. */
+    seed_device();
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, false);
+
+    uint32_t value = 0xDEADBEEFU;
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_BUS_BUSY,
+        ina238_read_reg24(&s_dev, INA238_REG_POWER, &value));
+    TEST_ASSERT_EQUAL_UINT32(0xDEADBEEFU, value);
+}
+
 void test_read_shunt_uv_positive_value(void)
 {
     seed_device();
@@ -628,6 +643,59 @@ void test_probe_propagates_bus_busy_from_dev_id_read(void)
         .adc_range_low = false,
     };
     TEST_ASSERT_EQUAL_INT(INA238_ERR_BUS_BUSY, ina238_probe(&s_dev, &cfg));
+}
+
+/* ----- End-to-end ADCRANGE wiring -----
+ *
+ * Probe latches dev->shunt_lsb_nv from cfg.adc_range_low so subsequent
+ * read_shunt_uv calls scale by the right per-LSB voltage. The earlier
+ * read_shunt_uv tests use seed_device() which sets shunt_lsb_nv
+ * directly - these tests go the full cfg -> probe -> read path so the
+ * ternary in probe is exercised in BOTH directions and we'd catch a
+ * regression where, say, probe ignored adc_range_low. */
+
+void test_probe_range0_then_read_shunt_uses_5000_nV_per_lsb(void)
+{
+    /* adc_range_low=false -> RANGE0 = 5000 nV/LSB.
+     * Raw 0x0100 = 256 LSBs × 5000 nV / 1000 = 1280 µV. */
+    expect_register_read(INA238_REG_MANUFACTURER_ID, INA238_MANUFACTURER_ID);
+    expect_register_read(INA238_REG_DEVICE_ID, 0x2381U);
+
+    const ina238_config_t cfg = {
+        .hi2c = &hi2c1, .i2c_addr_7bit = 0x40,
+        .shunt_micro_ohm = 4000U, .max_expected_current_ma = 40000U,
+        .adc_range_low = false,
+    };
+    TEST_ASSERT_EQUAL_INT(INA238_OK, ina238_probe(&s_dev, &cfg));
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)INA238_VSHUNT_LSB_nV_RANGE0,
+                             s_dev.shunt_lsb_nv);
+
+    expect_register_read(INA238_REG_VSHUNT, 0x0100U);
+    int32_t uv = 0;
+    TEST_ASSERT_EQUAL_INT(INA238_OK, ina238_read_shunt_uv(&s_dev, &uv));
+    TEST_ASSERT_EQUAL_INT32(1280, uv);
+}
+
+void test_probe_range1_then_read_shunt_uses_1250_nV_per_lsb(void)
+{
+    /* adc_range_low=true -> RANGE1 = 1250 nV/LSB (4x finer than RANGE0).
+     * Raw 0x0100 = 256 LSBs × 1250 nV / 1000 = 320 µV. */
+    expect_register_read(INA238_REG_MANUFACTURER_ID, INA238_MANUFACTURER_ID);
+    expect_register_read(INA238_REG_DEVICE_ID, 0x2381U);
+
+    const ina238_config_t cfg = {
+        .hi2c = &hi2c1, .i2c_addr_7bit = 0x40,
+        .shunt_micro_ohm = 4000U, .max_expected_current_ma = 40000U,
+        .adc_range_low = true,
+    };
+    TEST_ASSERT_EQUAL_INT(INA238_OK, ina238_probe(&s_dev, &cfg));
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)INA238_VSHUNT_LSB_nV_RANGE1,
+                             s_dev.shunt_lsb_nv);
+
+    expect_register_read(INA238_REG_VSHUNT, 0x0100U);
+    int32_t uv = 0;
+    TEST_ASSERT_EQUAL_INT(INA238_OK, ina238_read_shunt_uv(&s_dev, &uv));
+    TEST_ASSERT_EQUAL_INT32(320, uv);
 }
 
 /* ----- Stack high-water tracking -----
