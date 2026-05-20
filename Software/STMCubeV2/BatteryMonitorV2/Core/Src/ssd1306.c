@@ -141,6 +141,19 @@ ssd1306_status_t ssd1306_init(uint8_t i2c_addr_7bit)
         return SSD1306_ERR_PROBE;
     }
 
+    /* Hardware-verified setup: u8g2's SSD1306 univision 128x32 driver
+     * matches this panel's init expectations (column mapping, charge
+     * pump, segment-remap). Other variants tried but reverted:
+     *   - sh1106_i2c_128x32_visionox_1: caused widespread render
+     *     artifacts (column offset incompatible with this panel).
+     *
+     * Known cosmetic: a single stray pixel appears at panel (0,0)
+     * after the first frame draws — confirmed not from our drawing
+     * code (it persists through blank u8g2_FirstPage/NextPage
+     * flushes) and not present before the first non-init data write.
+     * Likely a panel hardware quirk (stuck pixel activated when
+     * display goes active) or a u8g2 / SSD1306 init quirk we
+     * haven't fully traced. One pixel out of 4096; deferred. */
     u8g2_Setup_ssd1306_i2c_128x32_univision_1(
         &s_u8g2,
         U8G2_R0,
