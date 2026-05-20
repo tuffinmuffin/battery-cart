@@ -143,6 +143,18 @@ void test_error_callback_is_noop_before_init(void)
     HAL_I2C_ErrorCallback(&hi2c1);
 }
 
+void test_init_is_idempotent_after_first_success(void)
+{
+    /* The very first ensure_init() registered exactly one osMutexNew +
+     * osSemaphoreNew expectation and called i2c_bus_init() once. This
+     * test calls it again with ZERO new expectations - the
+     * `if (s_initialised) return;` guard must fire before either
+     * RTOS-create function is consulted, otherwise CMock surfaces an
+     * "unexpected call" failure. */
+    ensure_init();
+    i2c_bus_init();
+}
+
 void test_lock_calls_osMutexAcquire_with_timeout(void)
 {
     ensure_init();

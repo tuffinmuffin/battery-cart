@@ -132,8 +132,14 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
  * 0x00..0x07 and 0x78..0x7F are reserved by the I2C spec). Each call
  * holds the bus for at most `timeout_ms` if the address NACKs, much less
  * if it ACKs. With 10 ms per address and a sparse bus, expect ~1.1 s total.
+ *
+ * Coverage waiver: scan is a bringup / debug utility, not a runtime-critical
+ * path. test_i2c_bus.c still exercises it as a functional regression check,
+ * but the lines don't drag on the production coverage metric. Drop the
+ * waiver if scan ever becomes part of a runtime health check.
  */
 
+/* GCOVR_EXCL_START */
 int i2c_bus_scan(void *hi2c, char *out, size_t out_size)
 {
     if (out == NULL || out_size == 0) {
@@ -172,3 +178,4 @@ int i2c_bus_scan(void *hi2c, char *out, size_t out_size)
     i2c_bus_unlock();
     return found;
 }
+/* GCOVR_EXCL_STOP */
