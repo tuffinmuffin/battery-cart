@@ -1,0 +1,11 @@
+u8g2 2.36.19 - vendored from https://github.com/olikraus/u8g2/releases/tag/2.36.19
+Trimmed to: csrc/ (engine + display drivers, no fonts) + sys/sdl/common/ (SDL backend for desktop layout sim) + LICENSE + ChangeLog + README.md.
+
+Fonts NOT vendored:
+- csrc/u8g2_fonts.c   (39 MB, every stock font in one file)
+- csrc/u8x8_fonts.c   (1.6 MB, every u8x8 font in one file)
+Project supplies custom character-subset fonts under Core/Src/fonts/, generated via scripts/build-fonts.sh by running upstream bdfconv against u8g2's BDF sources. See scripts/build-fonts.sh for the exact glyph list.
+
+If a stock font is ever needed (debug, sim), extract its single u8g2_font_<name>[] declaration from upstream csrc/u8g2_fonts.c into a standalone .c under Core/Src/fonts/ — do not re-vendor the multi-megabyte mega-file.
+
+License: BSD 2-clause (see LICENSE).
