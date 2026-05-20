@@ -13,10 +13,6 @@
  * `*_read()` returns true when the pin reads logical HIGH (switch pressed,
  * pulldown means released = LOW). If hardware inverts a signal, flip it
  * here, not at the call site.
- *
- * Note: the switches are physically depopulated during the OLED rework, so
- * the wrappers stay but no module currently calls them. They get wired
- * back into the display / menu task when the buttons are re-fitted.
  */
 
 #ifndef DIRECT_IO_H
