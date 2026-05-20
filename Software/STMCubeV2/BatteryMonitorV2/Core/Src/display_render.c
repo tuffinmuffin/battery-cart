@@ -130,10 +130,10 @@ void display_render(u8g2_t *u8g2,
     u8g2_FirstPage(u8g2);
     do {
         /* --- Right-side big-digit reading + unit (right-aligned) -- */
-        u8g2_SetFont(u8g2, bm_big_digits);
+        u8g2_SetFont(u8g2, bm_font_18b);
         const u8g2_uint_t reading_w = u8g2_GetStrWidth(u8g2, reading);
 
-        u8g2_SetFont(u8g2, bm_small_status);
+        u8g2_SetFont(u8g2, bm_font_5x7);
         const u8g2_uint_t unit_w = u8g2_GetStrWidth(u8g2, unit);
 
         /* Lay out so the unit's rightmost pixel sits at HEADLINE_RIGHT_X.
@@ -144,15 +144,15 @@ void display_render(u8g2_t *u8g2,
         const u8g2_uint_t reading_x =
             (u8g2_uint_t)(unit_x - reading_w - 1);
 
-        u8g2_SetFont(u8g2, bm_big_digits);
+        u8g2_SetFont(u8g2, bm_font_18b);
         u8g2_DrawStr(u8g2, reading_x, HEADLINE_BASELINE_Y, reading);
 
-        u8g2_SetFont(u8g2, bm_small_status);
+        u8g2_SetFont(u8g2, bm_font_5x7);
         u8g2_DrawStr(u8g2, unit_x, HEADLINE_BASELINE_Y, unit);
 
         /* --- Left-side status label (medium font, baseline-aligned) -- */
         if (status_label != NULL && status_label[0] != '\0') {
-            u8g2_SetFont(u8g2, bm_state_label);
+            u8g2_SetFont(u8g2, bm_font_15b);
             u8g2_DrawStr(u8g2, 0, HEADLINE_BASELINE_Y, status_label);
         }
 

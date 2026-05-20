@@ -11,9 +11,9 @@
  * Layout (128x32):
  *
  *   .--------------------------------------------------------.
- *   | Charging                            13.5V  |  bm_state_label
- *   |                                            |  + bm_big_digits
- *   |                                            |  + bm_small_status
+ *   | Charging                            13.5V  |  bm_font_15b
+ *   |                                            |  + bm_font_18b
+ *   |                                            |  + bm_font_5x7
  *   | 00:23:45                       F K B  [♥]  |  tray (5x7):
  *   '--------------------------------------------------------'  alternating
  *                                                                bottom-left

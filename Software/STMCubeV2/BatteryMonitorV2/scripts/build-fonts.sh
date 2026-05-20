@@ -81,46 +81,46 @@ prepend_include() {
     mv "$tmp" "$file"
 }
 
-# --- bm_big_digits ------------------------------------------------------
+# --- bm_font_18b ------------------------------------------------------
 # Headline V / A readout on the 128x32 OLED — and any other place that
 # wants chunky bold characters (e.g. a future "FAULT" banner).
 # Glyphs: full printable ASCII 32-126.
 # Source: 9x18B — 9x18 bold monospace, 18 px tall, 9 px wide. Fits 12-14
 # chars across the 128 px panel with margin. Proven X11 font.
-echo "    bm_big_digits   <- 9x18B.bdf, glyphs: printable ASCII (32-126)"
+echo "    bm_font_18b   <- 9x18B.bdf, glyphs: printable ASCII (32-126)"
 "$BDFCONV" -v -f 1 -m '32-126' \
-    -n bm_big_digits \
-    -o "$OUT_DIR/bm_big_digits.c" \
+    -n bm_font_18b \
+    -o "$OUT_DIR/bm_font_18b.c" \
     "$BDF_DIR/9x18B.bdf"
-prepend_include "$OUT_DIR/bm_big_digits.c"
+prepend_include "$OUT_DIR/bm_font_18b.c"
 
-# --- bm_state_label -----------------------------------------------------
+# --- bm_font_15b -----------------------------------------------------
 # Headline status label ("Charging" / "No Batt" / "Trickle" / etc.).
-# Sized to visually match the bm_big_digits headline weight on the right
+# Sized to visually match the bm_font_18b headline weight on the right
 # side of the panel — 15 px tall is ~83% of the 18 px digits, close
 # enough that the two halves don't look mismatched.
 # Glyphs: full printable ASCII 32-126.
 # Source: 9x15B  — bold mono 9x15.
-echo "    bm_state_label  <- 9x15B.bdf, glyphs: printable ASCII (32-126)"
+echo "    bm_font_15b  <- 9x15B.bdf, glyphs: printable ASCII (32-126)"
 "$BDFCONV" -v -f 1 -m '32-126' \
-    -n bm_state_label \
-    -o "$OUT_DIR/bm_state_label.c" \
+    -n bm_font_15b \
+    -o "$OUT_DIR/bm_font_15b.c" \
     "$BDF_DIR/9x15B.bdf"
-prepend_include "$OUT_DIR/bm_state_label.c"
+prepend_include "$OUT_DIR/bm_font_15b.c"
 
-# --- bm_small_status ----------------------------------------------------
+# --- bm_font_5x7 ----------------------------------------------------
 # Bottom tray (charge timer + F/K/B indicators), V/A unit suffixes next
 # to the big-digit reading, and any future "details" text that has to
 # fit in a tight row.
 # Glyphs: full printable ASCII 32-126.
 # Source: 5x7 — 5x7 fixed monospace. Fits ~25 chars across at 7 px tall,
 # leaves ~25 px headroom in the 32 px panel for the headline.
-echo "    bm_small_status <- 5x7.bdf, glyphs: printable ASCII (32-126)"
+echo "    bm_font_5x7 <- 5x7.bdf, glyphs: printable ASCII (32-126)"
 "$BDFCONV" -v -f 1 -m '32-126' \
-    -n bm_small_status \
-    -o "$OUT_DIR/bm_small_status.c" \
+    -n bm_font_5x7 \
+    -o "$OUT_DIR/bm_font_5x7.c" \
     "$BDF_DIR/5x7.bdf"
-prepend_include "$OUT_DIR/bm_small_status.c"
+prepend_include "$OUT_DIR/bm_font_5x7.c"
 
 echo ""
 echo "==> Done. Generated:"
