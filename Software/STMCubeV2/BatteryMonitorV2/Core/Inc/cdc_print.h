@@ -37,8 +37,8 @@ extern "C" {
 void cdc_print_init(void);
 
 /* Blocking write of raw bytes to USB-CDC. See file header for the
- * blocking semantics. Use this for pre-formatted strings (e.g. the
- * output of i2c_bus_scan) so we don't pay the printf cost twice. */
+ * blocking semantics. Use this for pre-formatted strings so we don't
+ * pay the printf cost twice. */
 void cdc_write(const void *buf, size_t len);
 
 /* printf to USB-CDC. Formats into the shared buffer then writes via

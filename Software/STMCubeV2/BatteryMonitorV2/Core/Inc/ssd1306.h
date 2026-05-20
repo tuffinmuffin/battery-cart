@@ -26,11 +26,10 @@ typedef enum {
     SSD1306_ERR_BUS   = 2,  /* HAL_I2C_Master_Transmit failed during init */
 } ssd1306_status_t;
 
-/* Most 128x32 SSD1306 modules tie SA0 low → 0x3C; a handful tie it high →
- * 0x3D. Caller passes the actual address to ssd1306_init() — display_task
- * tries 0x3C then 0x3D so we can bring up unknown modules without rebuilding. */
-#define SSD1306_I2C_ADDR_PRIMARY    0x3CU
-#define SSD1306_I2C_ADDR_ALTERNATE  0x3DU
+/* SA0 strap is tied low on this board → 0x3C. The init API still takes
+ * the address as a parameter so a future board / second display can use
+ * a different one without an API churn. */
+#define SSD1306_I2C_ADDR_DEFAULT    0x3CU
 
 /* Probes the display on I2C2 at the given 7-bit address, runs u8g2's init
  * sequence, clears the panel. Safe to call from a FreeRTOS task only

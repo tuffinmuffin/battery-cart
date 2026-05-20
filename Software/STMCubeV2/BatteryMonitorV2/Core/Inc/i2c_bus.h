@@ -54,21 +54,6 @@ void i2c_bus_unlock(void);
  * Must only be called between i2c_bus_lock() and i2c_bus_unlock(). */
 bool i2c_bus_wait_complete(uint32_t timeout_ms);
 
-/* Sweep 7-bit addresses 0x08..0x77, format `out` as
- *   "scan: 0xNN 0xNN ..."  (or "scan: (none)" if no device ACKs).
- * Returns the count of devices found. Uses blocking HAL_I2C_IsDeviceReady
- * (no DMA), so calls don't fire the bus's completion callback. Acquires
- * the bus mutex for the duration of the scan.
- *
- * Total scan time is ~1 s when no devices respond; faster when ACKs cut
- * the per-address timeout short. Output buffer should be >= 128 bytes to
- * hold the worst case (every address present).
- *
- * The handle is opaque (`void *`) at this layer — pass `&hi2c1`. Avoiding
- * the typed handle keeps i2c.h out of this header, which lets CMock
- * generate a mock without dragging stm32c0xx_hal.h into host tests. */
-int i2c_bus_scan(void *hi2c, char *out, size_t out_size);
-
 #ifdef __cplusplus
 }
 #endif
