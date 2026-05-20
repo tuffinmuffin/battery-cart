@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
-# build-fonts.sh — regenerate the custom-subset u8g2 fonts under Core/Src/fonts/.
+# build-fonts.sh — regenerate the project's u8g2 fonts under Core/Src/fonts/.
 #
 # u8g2's stock fonts are vendored as one 39 MB mega-file we explicitly
 # excluded from Middlewares/u8g2/ (see VERSION.txt). Instead, this script
-# builds upstream bdfconv on demand, points it at a couple of BDF source
-# fonts from u8g2's tools/font/bdf/ tree, and outputs only the glyphs we
-# actually draw — saving ~3-4 KB FLASH vs. the smallest stock alternatives.
+# builds upstream bdfconv on demand, points it at our chosen BDF source
+# fonts from u8g2's tools/font/bdf/ tree, and emits packed u8g2 font
+# arrays sized to the printable ASCII subset (32-126, 95 glyphs each).
+#
+# An earlier version of this script trimmed each font to only the glyphs
+# in use at the time (~14-68 glyphs each, ~1.4 KB total). Measured cost
+# of moving to full printable ASCII was ~+1.5 KB FLASH for ~135 extra
+# glyphs across three fonts — cheap enough that the engineering win of
+# "any new screen / label just works" beats the footprint savings.
 #
 # Usage (Windows host, project root):
 #     wsl bash scripts/build-fonts.sh
@@ -16,9 +22,9 @@
 # Requires: bash, curl, tar, gcc, make. Already installed by setup-wsl.sh.
 #
 # The generated .c files ARE checked in. Re-run this only when:
-#   - changing the glyph subset (edit the -m strings below)
 #   - bumping the u8g2 vendored version (update U8G2_VERSION below)
 #   - changing the source BDF font (edit the bdfconv invocation)
+#   - intentionally narrowing the glyph set again to claw back FLASH
 
 set -euo pipefail
 
@@ -76,44 +82,41 @@ prepend_include() {
 }
 
 # --- bm_big_digits ------------------------------------------------------
-# Used for the headline V / A readout on the 128x32 OLED.
-# Glyphs: space(32), '-'(45), '.'(46), '/'(47), '0'-'9'(48-57)  — 14 glyphs.
-# '/' comes free with the contiguous '-'..'9' range; harmless if unused.
-# '-' kept for signed current rendering (e.g. discharge).
+# Headline V / A readout on the 128x32 OLED — and any other place that
+# wants chunky bold characters (e.g. a future "FAULT" banner).
+# Glyphs: full printable ASCII 32-126.
 # Source: 9x18B — 9x18 bold monospace, 18 px tall, 9 px wide. Fits 12-14
 # chars across the 128 px panel with margin. Proven X11 font.
-echo "    bm_big_digits   <- 9x18B.bdf, glyphs: ' -./0-9'"
-"$BDFCONV" -v -f 1 -m '32,45-57' \
+echo "    bm_big_digits   <- 9x18B.bdf, glyphs: printable ASCII (32-126)"
+"$BDFCONV" -v -f 1 -m '32-126' \
     -n bm_big_digits \
     -o "$OUT_DIR/bm_big_digits.c" \
     "$BDF_DIR/9x18B.bdf"
 prepend_include "$OUT_DIR/bm_big_digits.c"
 
 # --- bm_state_label -----------------------------------------------------
-# Used for the headline status label ("Charging" / "No Batt" / "Trickle"
-# / etc.). Sized to visually match the bm_big_digits headline weight on
-# the right side of the panel — 15 px tall is ~83% of the 18 px digits,
-# close enough that the two halves don't look mismatched.
-# Glyphs: space(32), '%'(37), '-./0-9:'(45-58), 'A'-'Z'(65-90), 'a'-'z'(97-122).
+# Headline status label ("Charging" / "No Batt" / "Trickle" / etc.).
+# Sized to visually match the bm_big_digits headline weight on the right
+# side of the panel — 15 px tall is ~83% of the 18 px digits, close
+# enough that the two halves don't look mismatched.
+# Glyphs: full printable ASCII 32-126.
 # Source: 9x15B  — bold mono 9x15.
-echo "    bm_state_label  <- 9x15B.bdf, glyphs: ' %-./0-9:A-Za-z'"
-"$BDFCONV" -v -f 1 -m '32,37,45-58,65-90,97-122' \
+echo "    bm_state_label  <- 9x15B.bdf, glyphs: printable ASCII (32-126)"
+"$BDFCONV" -v -f 1 -m '32-126' \
     -n bm_state_label \
     -o "$OUT_DIR/bm_state_label.c" \
     "$BDF_DIR/9x15B.bdf"
 prepend_include "$OUT_DIR/bm_state_label.c"
 
 # --- bm_small_status ----------------------------------------------------
-# Used for the bottom tray (charge timer + K/B indicators) and the V/A
-# unit suffixes next to the big-digit reading.
-# Glyphs: space(32), '%'(37), '-./0-9:'(45-58), 'A'-'Z'(65-90), 'a'-'z'(97-122).
-# Lowercase included so labels like "Charging" / "No Batt" / "Trickle"
-# render correctly — earlier subset was uppercase-only and showed only
-# the first letter of each word.
+# Bottom tray (charge timer + F/K/B indicators), V/A unit suffixes next
+# to the big-digit reading, and any future "details" text that has to
+# fit in a tight row.
+# Glyphs: full printable ASCII 32-126.
 # Source: 5x7 — 5x7 fixed monospace. Fits ~25 chars across at 7 px tall,
 # leaves ~25 px headroom in the 32 px panel for the headline.
-echo "    bm_small_status <- 5x7.bdf, glyphs: ' %-./0-9:A-Za-z'"
-"$BDFCONV" -v -f 1 -m '32,37,45-58,65-90,97-122' \
+echo "    bm_small_status <- 5x7.bdf, glyphs: printable ASCII (32-126)"
+"$BDFCONV" -v -f 1 -m '32-126' \
     -n bm_small_status \
     -o "$OUT_DIR/bm_small_status.c" \
     "$BDF_DIR/5x7.bdf"

@@ -5,16 +5,20 @@
  * bdfconv from scripts/build-fonts.sh; do NOT edit them. To change the
  * glyph set or source BDF, edit the script and re-run.
  *
- * Glyph subsets (see build-fonts.sh for the exact -m maps):
- *   bm_big_digits   — '-./0-9' + space, 14 glyphs, 9x18B bold mono.
- *                     Headline V / A readout on the top-right.
- *   bm_state_label  — '%-./0-9:A-Za-z' + space, 68 glyphs, 9x15B bold mono.
- *                     Headline status label on the top-left ("Charging",
- *                     "No Batt", "Trickle", etc.). Sized to visually
- *                     match bm_big_digits next to it.
- *   bm_small_status — '%-./0-9:A-Za-z' + space, 68 glyphs, 5x7 fixed mono.
- *                     Bottom tray (charge timer + K/B indicators) and the
- *                     V/A unit suffixes next to the big-digit reading.
+ * All three fonts carry the full printable-ASCII subset (32-126, 95
+ * glyphs each) so new screens / labels can use any character without
+ * re-running bdfconv. Total packed cost is ~3 KB FLASH; a tighter
+ * subset would save ~1.5 KB but is rarely worth the friction.
+ *
+ *   bm_big_digits   — 9x18B bold mono. Chunky headline numbers + any
+ *                     other place that wants big bold text (e.g. a
+ *                     future "FAULT" banner).
+ *   bm_state_label  — 9x15B bold mono. Headline status label
+ *                     ("Charging" / "No Batt" / "Trickle" / etc.).
+ *                     Sized to visually match bm_big_digits next to it.
+ *   bm_small_status — 5x7 fixed mono. Bottom tray (charge timer +
+ *                     F/K/B indicators), V/A unit suffixes, and any
+ *                     tight-row details text.
  */
 
 #ifndef BM_FONTS_H
