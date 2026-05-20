@@ -111,7 +111,18 @@ static void DisplayTaskBody(void *argument)
         const uint32_t charge_time_s =
             frame / (1000U / DISPLAY_TASK_FRAME_INTERVAL_MS);
 
-        display_render(u8g2, label, charge_time_s, serial, show_v, &snap);
+        const display_ctx_t ctx = {
+            .view = DISPLAY_VIEW_MAIN,
+            .u.main = {
+                .status_label  = label,
+                .charge_time_s = charge_time_s,
+                .serial        = serial,
+                .charge_pct    = 0xFFU,    /* unknown — renderer ignores */
+                .show_voltage  = show_v,
+                .snap          = &snap,
+            },
+        };
+        display_render(u8g2, &ctx);
 
         frame++;
         osDelay(DISPLAY_TASK_FRAME_INTERVAL_MS);
