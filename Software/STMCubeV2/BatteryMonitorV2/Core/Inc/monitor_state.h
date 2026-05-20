@@ -1,6 +1,15 @@
 /**
  * monitor_state.h — shared snapshot of the latest battery-monitor readings.
  *
+ * TODO(replace): bring-up placeholder. The real design will need more
+ * than a single mutex-protected snapshot — likely a charging state
+ * machine that owns both the live readings AND derived state (charge
+ * timer, NFC serial, fault flags, state transitions), with a
+ * publish/subscribe shape so screens / loggers / safety interlocks
+ * can each subscribe to the fields they care about. Treat what's here
+ * as scaffolding to keep the display layer fed during bring-up; do
+ * not grow it.
+ *
  * The INA238 task (when enabled) is the producer; the display task is
  * the consumer. A single mutex-protected snapshot keeps the producer
  * and consumer decoupled — neither holds the bus mutex while drawing

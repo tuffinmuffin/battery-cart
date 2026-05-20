@@ -26,10 +26,6 @@ void led_disable(void)
 
 bool led_state(void)
 {
-    /* HAL_GPIO_ReadPin on an output pin reads the IDR which on STM32
-     * mirrors the driven output level — exactly what we want here so
-     * the display heartbeat tracks the actual LED line, not a
-     * shadow variable that could drift. */
     return HAL_GPIO_ReadPin(MCU_LED_GPIO_Port, MCU_LED_Pin) == GPIO_PIN_SET;
 }
 

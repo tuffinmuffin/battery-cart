@@ -1,22 +1,17 @@
 /**
- * display_task.c — bring-up smoke test for the 128x32 OLED.
+ * display_task.c — FreeRTOS task that drives the OLED render loop.
  *
- * This is the placeholder render loop: a frame + horizontal/vertical
- * crosshair + a small box that walks across the bottom. No text yet —
- * fonts land in a later commit, then this loop gets replaced by the
- * real display_render() that paints live INA238 stats from the
- * monitor_state snapshot.
+ * After a one-shot probe + ssd1306_init at startup, the task sleeps
+ * to a fixed 5 Hz cadence: pulls the latest monitor_state snapshot,
+ * picks a status label and a view mode, and hands them to
+ * display_render() which paints one full frame.
  *
- * Goal of this stage: confirm that ssd1306_init succeeds, that u8g2's
- * page iteration flushes correctly over I2C2, and that the visible
- * pixels match what we asked u8g2 to draw (i.e. the SSD1306 vs
- * SSD1116/SH1106 column-offset quirk would show up here as a 2 px
- * shift on the frame).
- *
- * Address discovery is scan-driven: on every retry the task re-scans
- * I2C2 and only ssd1306_init()s addresses that actually ACK'd. That
- * lets a late-plugged module come up without a reset, and avoids
- * hammering ssd1306_init() against a quiet bus.
+ * TEMP (also marked inline near the loop): until the real charge-
+ * state machine + INA238 producer wire up to monitor_state, the
+ * task injects a sweep of fake vbus / current / k1 / bleed / fan /
+ * temp values and rotates through three demo status labels every
+ * 4 s so the layout exercises against realistic-shaped data on
+ * hardware.
  */
 
 #include "display_task.h"

@@ -33,9 +33,6 @@ extern "C" {
 void led_toggle(void);
 void led_enable(void);
 void led_disable(void);
-/* Read back the actual output state from the GPIO peripheral. Used by
- * the display task to sync the on-screen "heart" indicator with the
- * physical LED heartbeat. */
 bool led_state(void);
 
 /* --- Relay K1 (PA1) --- */
