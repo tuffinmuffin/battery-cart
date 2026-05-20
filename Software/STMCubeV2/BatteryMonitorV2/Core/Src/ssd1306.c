@@ -128,14 +128,14 @@ static uint8_t u8x8_gpio_and_delay_stm32(u8x8_t *u8x8, uint8_t msg,
     return 1;
 }
 
-ssd1306_status_t ssd1306_init(void)
+ssd1306_status_t ssd1306_init(uint8_t i2c_addr_7bit)
 {
     /* Verify the device ACKs its address before we send any init bytes —
      * gives a clean "PROBE" error instead of a downstream init failure if
      * the module is unplugged, mis-soldered, or strapped to a different
      * I2C address. */
     if (HAL_I2C_IsDeviceReady(&hi2c2,
-                              (uint16_t)(SSD1306_I2C_ADDR_7BIT << 1U),
+                              (uint16_t)(i2c_addr_7bit << 1U),
                               SSD1306_PROBE_TRIES,
                               SSD1306_PROBE_TIMEOUT_MS) != HAL_OK) {
         return SSD1306_ERR_PROBE;
@@ -151,7 +151,7 @@ ssd1306_status_t ssd1306_init(void)
      * the u8x8 sub-struct; our byte callback reads it back via
      * u8x8_GetI2CAddress on every transfer. */
     u8x8_SetI2CAddress(u8g2_GetU8x8(&s_u8g2),
-                       (uint8_t)(SSD1306_I2C_ADDR_7BIT << 1U));
+                       (uint8_t)(i2c_addr_7bit << 1U));
 
     u8g2_InitDisplay(&s_u8g2);
     u8g2_SetPowerSave(&s_u8g2, 0);  /* wake panel from sleep */

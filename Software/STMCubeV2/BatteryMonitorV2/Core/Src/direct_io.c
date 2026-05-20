@@ -68,3 +68,15 @@ void fan_set_duty(uint8_t percent)
     const uint32_t ccr = ((uint32_t)percent * arr) / 100U;
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, ccr);
 }
+
+/* ----- Switches (front-panel buttons) ----- */
+
+bool sw_a_read(void)
+{
+    return HAL_GPIO_ReadPin(SW_A_GPIO_Port, SW_A_Pin) == GPIO_PIN_SET;
+}
+
+bool sw_b_read(void)
+{
+    return HAL_GPIO_ReadPin(SW_B_GPIO_Port, SW_B_Pin) == GPIO_PIN_SET;
+}

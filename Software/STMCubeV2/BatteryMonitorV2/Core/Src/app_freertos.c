@@ -116,7 +116,12 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_THREADS */
   usbDeviceTaskHandle = osThreadNew(StartUsbDeviceTask, NULL, &usbDeviceTask_attributes);
   telemetryTaskHandle = osThreadNew(StartTelemetryTask, NULL, &telemetryTask_attributes);
-  ina238_task_start();
+  /* INA238 smoke task disabled — it was an I2C-interface bring-up test,
+   * not a useful runtime path yet. The driver itself (Core/Src/ina238.c)
+   * stays linked so a future controller can use it directly without
+   * waking this CDC-noisy logger. Re-enable when we want telemetry on
+   * the CDC port for debugging. */
+  /* ina238_task_start(); */
   display_task_start();
   /* USER CODE END RTOS_THREADS */
 

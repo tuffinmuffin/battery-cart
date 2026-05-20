@@ -26,14 +26,16 @@ typedef enum {
     SSD1306_ERR_BUS   = 2,  /* HAL_I2C_Master_Transmit failed during init */
 } ssd1306_status_t;
 
-/* 7-bit I2C address of the OLED. Most 128x32 SSD1306 modules tie SA0 low →
- * 0x3C; a handful tie it high → 0x3D. Confirm via the I2C2 bus scan run
- * by the display task at startup. */
-#define SSD1306_I2C_ADDR_7BIT  0x3CU
+/* Most 128x32 SSD1306 modules tie SA0 low → 0x3C; a handful tie it high →
+ * 0x3D. Caller passes the actual address to ssd1306_init() — display_task
+ * tries 0x3C then 0x3D so we can bring up unknown modules without rebuilding. */
+#define SSD1306_I2C_ADDR_PRIMARY    0x3CU
+#define SSD1306_I2C_ADDR_ALTERNATE  0x3DU
 
-/* Probes the display on I2C2, runs u8g2's init sequence, clears the panel.
- * Safe to call from a FreeRTOS task only (sleeps via osDelay during init). */
-ssd1306_status_t ssd1306_init(void);
+/* Probes the display on I2C2 at the given 7-bit address, runs u8g2's init
+ * sequence, clears the panel. Safe to call from a FreeRTOS task only
+ * (sleeps via osDelay during init). */
+ssd1306_status_t ssd1306_init(uint8_t i2c_addr_7bit);
 
 /* Returns the module-owned u8g2 instance. NULL before init succeeds. */
 u8g2_t *ssd1306_u8g2(void);
