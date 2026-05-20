@@ -58,6 +58,13 @@ void cdc_write(const void *buf, size_t len)
 
 int cdc_vprintf(const char *fmt, va_list ap)
 {
+    /* Defensive guard: vsnprintf dereferences `fmt` without a NULL check, so
+     * a stray cdc_printf(NULL) - easy to hit via a misbehaving format-string
+     * helper - would crash on target. Cheaper to short-circuit here than to
+     * debug a wild dereference after the fact. */
+    if (fmt == NULL) {
+        return -1;
+    }
     if (s_mutex == NULL || osMutexAcquire(s_mutex, CDC_PRINT_LOCK_MS) != osOK) {
         return -1;
     }

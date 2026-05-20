@@ -221,6 +221,36 @@ void test_cdc_printf_returns_minus_one_when_mutex_acquire_fails(void)
     TEST_ASSERT_EQUAL_INT(-1, rc);
 }
 
+void test_cdc_printf_rejects_null_format_without_touching_mutex(void)
+{
+    /* Defensive guard: vsnprintf has no NULL check, so cdc_printf(NULL)
+     * would crash on target. The NULL-fmt branch fires BEFORE the mutex
+     * acquire, so this post-init test registers ZERO osMutexAcquire /
+     * osMutexRelease expectations - any leak through the guard into the
+     * lock path would surface as CMock's "unexpected call" failure.
+     * Indirected via a runtime pointer so the
+     * `__attribute__((format(printf,1,2)))` doesn't compile-warn. */
+    ensure_init();
+    const char *bad = NULL;
+    int rc = cdc_printf(bad);
+    TEST_ASSERT_EQUAL_INT(-1, rc);
+}
+
+void test_cdc_printf_skips_cdc_write_when_format_produces_zero_bytes(void)
+{
+    /* vsnprintf("%s", "") returns 0 - the `if (n > 0)` guard then skips
+     * cdc_write entirely (no point flushing a zero-byte payload through
+     * USB), but we still lock + release the mutex so callers that race
+     * an empty line don't get a phantom unlock failure later. */
+    ensure_init();
+    osMutexAcquire_ExpectAndReturn(FAKE_MUTEX, CDC_PRINT_LOCK_MS, osOK);
+    /* No tud_cdc_* / osDelay expected - cdc_write must NOT be reached. */
+    osMutexRelease_ExpectAndReturn(FAKE_MUTEX, osOK);
+
+    int rc = cdc_printf("%s", "");
+    TEST_ASSERT_EQUAL_INT(0, rc);
+}
+
 void test_cdc_printf_caps_write_at_buffer_size_minus_one(void)
 {
     /* Force vsnprintf to want 300 bytes - the shared buffer is 256, so
