@@ -90,7 +90,7 @@ Currently (as of last known good build):
 - `cmake` — `bundles/cmake/4.3.1+st.1/bin/cmake.exe`
 - `ninja` — `bundles/ninja/1.13.2+st.1/bin/ninja.exe`
 - `starm-clang` toolchain — `bundles/st-arm-clang/21.1.1+st.7/bin/` (`starm-clang`, `starm-objcopy`, `starm-size`, etc.)
-- Toolchain file: [cmake/starm-clang.cmake](cmake/starm-clang.cmake) — Cortex-M0+, **picolibc** C library, `.elf` output, `-T STM32C071XX_FLASH.ld`
+- Toolchain file: [cmake/starm-clang.cmake](cmake/starm-clang.cmake) — Cortex-M0+, **picolibc** C library, `.elf` output, `-T BatteryMonitorV2.ld` (a renamed local copy of CubeMX's `STM32C071XX_FLASH.ld`, with ld.lld + DFU-alignment fixes — see file header)
 - Generator: Ninja
 - Presets: `Debug` (`-Og -g3`) and `Release` (`-Oz -g0`) → `build/Debug/`, `build/Release/`
 
@@ -227,8 +227,12 @@ Ceedling's [test/project.yml](test/project.yml) puts [test/support/](test/suppor
 **Build root** is `test/build/` (in-project). We briefly tried `/tmp/` for a 5-7× speedup on WSL, but it broke `gcov`'s source-path resolution (`.gcda` records source paths relative to the build dir, and `/tmp/.../Core/Src/...` resolved nowhere) so the Cobertura XML came out empty and Codecov rejected it. Working coverage > faster runs — revisit via `-fprofile-prefix-map` if WSL fs perf becomes painful.
 
 **To add a new module under test:**
-1. Create `test/test_<module>.c` mirroring the pattern in `test_direct_io.c`. Ceedling auto-links the matching `Core/Src/<module>.c` by filename.
-2. If the module uses HAL functions not already stubbed, add the prototype to [test/support/main.h](test/support/main.h) (or a peer header) and the corresponding `#include "mock_*.h"` to the test file.
+1. Add the new `Core/Src/<module>.c` path to `LINT_FILES` in [scripts/lint.py](scripts/lint.py) (existing requirement for clang-tidy coverage).
+2. Create `test/test_<module>.c` mirroring the pattern in `test_direct_io.c`. Ceedling auto-links the matching `Core/Src/<module>.c` by filename.
+3. If the module uses HAL functions not already stubbed, add the prototype to [test/support/main.h](test/support/main.h) (or a peer header) and the corresponding `#include "mock_*.h"` to the test file.
+4. If the module genuinely can't be host-tested (FreeRTOS task body, ISR forwarder, static descriptor tables), add it to `TEST_EXEMPT` in [scripts/check_tests.py](scripts/check_tests.py) **with a one-line reason** instead of step 2. The diff is reviewer-visible.
+
+**Test-coverage enforcement.** [scripts/check_tests.py](scripts/check_tests.py) asserts every entry in `LINT_FILES` either has a matching `test_<module>.c` or is in `TEST_EXEMPT`. CI runs it as the **last** step of the `test_unit` job — after the Codecov upload — so a missing test fails the job loudly without suppressing the coverage data for everything else. The HTML artifact and Codecov upload still publish first; the red status comes from this check. Run locally with `python scripts/check_tests.py --list` to see the current manifest.
 
 ## Coverage
 
@@ -248,7 +252,43 @@ Outputs land at `test/build/artifacts/gcov/gcovr/`:
 **Integrations:**
 - **CMake target:** `cmake --build build/Debug --target test_coverage`.
 - **VS Code task:** "Coverage (Ceedling gcov, WSL)".
-- **CI:** the `test_unit` job runs `ceedling gcov:all`, uploads the HTML report as a PR artifact (30-day retention), and pushes the Cobertura XML to **Codecov**. Codecov then posts inline coverage comments on PRs showing which added/changed lines aren't covered by tests.
+- **CI:** the `test_unit` job runs `ceedling gcov:all`, uploads the HTML report as a PR artifact (30-day retention), and pushes the Cobertura XML to **Codecov**.
+
+### Viewing coverage on a PR
+
+Four ways the report surfaces, in increasing detail:
+
+1. **PR comment from the Codecov bot.** Appears within a minute of `test_unit` finishing. Shows project-vs-patch deltas and a per-file table with links into the dashboard. Click a filename to jump to that file's annotated source on app.codecov.io. Updates in place on each push.
+2. **`codecov/patch` status check** in the PR's checks list. Fails when patch coverage falls below the `patch.target` set in [.codecov.yml](../../../.codecov.yml) (currently 70%). The `codecov/project` check is informational — it logs project drift but doesn't block merge.
+3. **Inline annotations in "Files changed"** — uncovered new lines render with a ⚠ marker next to the diff, same UX as ESLint/clang-tidy annotations. Powered by `github_checks.annotations: true` in [.codecov.yml](../../../.codecov.yml). No per-reviewer setup required.
+4. **HTML report as a workflow artifact.** Actions run → `coverage-html` → download the zip and open `GcovCoverageResults.html` for a local browseable view with line-by-line gutters (what's covered, partial, uncovered, branch-uncovered). Useful when you want to dig into a function without round-tripping through the dashboard.
+
+**Dashboard:** [app.codecov.io/gh/tuffinmuffin/battery-cart](https://app.codecov.io/gh/tuffinmuffin/battery-cart) — sunburst, file tree, commit/PR history. The PR comment links here.
+
+**Optional — richer inline view via browser extension.** The Codecov GitHub Checks annotations only mark uncovered lines. If you want full red/green gutters overlaid on every line of the diff, install the [Codecov browser extension](https://github.com/codecov/sourcegraph-codecov) (Chrome/Firefox). It's per-developer; the server-side annotations work without it.
+
+**Codecov upload token** lives in repo secret `CODECOV_TOKEN`. The upload step has `fail_ci_if_error: true`, so a token rotation that isn't reflected in the secret will fail the `test_unit` job — rotate both ends together.
+
+## Stack usage tracking
+
+Three complementary signals for "do FreeRTOS tasks fit in their `stack_size` budgets?"
+
+**1. Static report from `.su` files (target-accurate, fastest).** The firmware build emits per-function frame sizes via `-fstack-usage`. [scripts/stack_report.py](scripts/stack_report.py) parses every `.su` under the build dir, parses `arm-none-eabi-objdump -d`'s call graph from the ELF, and DFS-walks from each task entry function to compute worst-case stack depth.
+
+```
+python scripts/stack_report.py [--show-path] [--fail-pct 80]
+cmake --build build/Debug --target stack_report          # cmake wrapper
+```
+
+Output is a per-task table with `WORST / BUDGET / USED%`. Tasks where TinyUSB/HAL dispatch via function pointers get an `indirect-calls` flag — the static graph can't follow those, so trust the runtime HWM below instead.
+
+Task → `stack_size` mapping is hardcoded in the script (`TASK_BUDGETS`); update it when a task's attributes change.
+
+**2. Runtime high-water mark over CDC (most accurate, on-target).** [Core/Src/ina238_task.c](Core/Src/ina238_task.c) emits `stk_free=<N>B` on each 1 Hz telemetry line via `osThreadGetStackSpace(NULL)`. That's the minimum free bytes ever observed since the task started — what the kernel actually saw. Pattern is easy to copy to other tasks; rip the print line once the budget is settled.
+
+**3. Sentinel-fill in unit tests (regression detection, host-side).** [test/support/stack_measure.{h,c}](test/support/) runs a function under test on a pthread-allocated stack prefilled with `0xA5`, then scans for the first dirty byte. Caveats are spelled out in the header — short version: host frames, not ARM frames; pthread baseline is ~6 KB on glibc so always pair with an `run_empty` baseline and assert on the delta. Catches "somebody added a 2 KB local buffer" regressions; misses sub-baseline regressions.
+
+See `test_stack_delta_of_read_reg16_is_modest` in [test/test_ina238.c](test/test_ina238.c) for the pattern.
 
 ## Host-side serial tooling
 

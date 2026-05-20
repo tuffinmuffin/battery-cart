@@ -56,10 +56,19 @@ elseif(STARM_TOOLCHAIN_CONFIG STREQUAL "STARM_NEWLIB")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lcrt0-nosys")
 elseif(STARM_TOOLCHAIN_CONFIG STREQUAL "STARM_PICOLIBC")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lcrt0-hosted -z norelro")
+  # Picolibc ships five vfprintf variants. The default `vfprintf` symbol
+  # aliases to `__d_vfprintf` (double-supporting, ~2.5 KB) and pulls in
+  # `__dtoa_engine` (~1.2 KB) for float-to-ASCII. We never format floats,
+  # so redirect vfprintf to the integer-only variant `__i_vfprintf`
+  # (~1.3 KB, full width/padding/precision specs, no float). Saves ~2.4 KB
+  # of flash without losing any specifier we actually use.
+  # Affects vsnprintf, sprintf, snprintf, fprintf, printf — all share the
+  # vfprintf core.
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--defsym=vfprintf=__i_vfprintf")
 
 endif()
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T \"${CMAKE_SOURCE_DIR}/STM32C071XX_FLASH.ld\"")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T \"${CMAKE_SOURCE_DIR}/BatteryMonitorV2.ld\"")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Map=${CMAKE_PROJECT_NAME}.map -Wl,--gc-sections")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -z noexecstack")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--print-memory-usage ")

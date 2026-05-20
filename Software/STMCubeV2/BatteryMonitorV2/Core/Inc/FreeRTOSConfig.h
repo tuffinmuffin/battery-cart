@@ -79,15 +79,14 @@ extern uint32_t SystemCoreClock;
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION  0
 #define configUSE_TASK_NOTIFICATIONS             1
 #define configRECORD_STACK_HIGH_ADDRESS          1
-#define configUSE_POSIX_ERRNO                    1
 #define configHEAP_CLEAR_MEMORY_ON_FREE          0
 #define configUSE_MINI_LIST_ITEM                 1
 #define configUSE_SB_COMPLETED_CALLBACK          0
 #define configKERNEL_PROVIDED_STATIC_MEMORY      1
 #define configSTATS_BUFFER_MAX_LENGTH            0xFFFF
 #define configENABLE_HEAP_PROTECTOR              0
-#define configUSE_EVENT_GROUPS                   1
-#define configUSE_STREAM_BUFFERS                 1
+#define configUSE_EVENT_GROUPS                   0
+#define configUSE_STREAM_BUFFERS                 0
 #define configCHECK_HANDLER_INSTALLATION         1
 #define configVALIDATE_HEAP_BLOCK_POINTER        0
 /* USER CODE BEGIN MESSAGE_BUFFER_LENGTH_TYPE */
@@ -113,9 +112,9 @@ extern uint32_t SystemCoreClock;
 /* CMSIS-RTOS V2 flags */
 #define configUSE_OS2_THREAD_SUSPEND_RESUME  1
 #define configUSE_OS2_THREAD_ENUMERATE       1
-#define configUSE_OS2_EVENTFLAGS_FROM_ISR    1
+#define configUSE_OS2_EVENTFLAGS_FROM_ISR    0
 #define configUSE_OS2_THREAD_FLAGS           1
-#define configUSE_OS2_TIMER                  1
+#define configUSE_OS2_TIMER                  0
 #define configUSE_OS2_MUTEX                  1
 
 /* Set the following definitions to 1 to include the API function, or zero
@@ -154,6 +153,22 @@ standard names. */
 
 /* USER CODE BEGIN Defines */
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
+
+/* CubeMX doesn't expose `configUSE_TIMERS` or `INCLUDE_xTimerPendFunctionCall`
+ * in its FreeRTOS settings pane, so both stay `1` at the top of this file
+ * on every regen. We never call osTimerNew / xTimerCreate, so override
+ * here to drop the timer-service task body, its static stack reservation,
+ * and the kernel-init code path that force-links the timer task.
+ *
+ * Replacements when timers are eventually needed:
+ *   - Periodic work → osDelay()-based tasks (works regardless of this flag).
+ *   - One-shots / debouncing → a deadline tracked against
+ *     osKernelGetTickCount() in a state-machine task, or HW TIM + semaphore. */
+#undef  configUSE_TIMERS
+#define configUSE_TIMERS                     0
+#undef  INCLUDE_xTimerPendFunctionCall
+#define INCLUDE_xTimerPendFunctionCall       0
+
 /* USER CODE END Defines */
 
 #endif /* __FREERTOS_CONFIG_H */

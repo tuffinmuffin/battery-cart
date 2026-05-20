@@ -20,7 +20,7 @@
 #include "main.h"
 #include "cmsis_os2.h"
 #include "adc.h"
-#include "crc.h"
+#include "dma.h"
 #include "dmamux.h"
 #include "flash.h"
 #include "i2c.h"
@@ -100,14 +100,14 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
   MX_FLASH_Init();
-  MX_I2C1_SMBUS_Init();
+  MX_I2C1_Init();
   MX_I2C2_Init();
   MX_USART1_UART_Init();
   MX_TIM1_Init();
   MX_DMAMUX_Init();
-  MX_CRC_Init();
   MX_USB_PCD_Init();
   /* USER CODE BEGIN 2 */
 
@@ -185,7 +185,7 @@ void PeriphCommonClock_Config(void)
   /** Initializes the common peripherals clocks
   */
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_HSIKER;
-  PeriphClkInit.HSIKerClockDivider = RCC_HSIKER_DIV8;
+  PeriphClkInit.HSIKerClockDivider = RCC_HSIKER_DIV4;
 
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {

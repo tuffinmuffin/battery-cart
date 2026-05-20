@@ -8,11 +8,12 @@ STM32C071 / FreeRTOS 11.2 (X-CUBE-FREERTOS pack, *not* legacy middleware) / Tiny
 2. **Don't edit anything under [cmake/stm32cubemx/](cmake/stm32cubemx/)** — CubeMX regenerates it. Add custom CMake to the project-level [CMakeLists.txt](CMakeLists.txt) instead.
 3. **TinyUSB owns the USB peripheral at runtime, not HAL.** `MX_USB_PCD_Init` runs at boot and is harmless; `tud_init(0)` reprograms the registers. The IRQ handler in [Core/Src/stm32c0xx_it.c](Core/Src/stm32c0xx_it.c) uses a `USER CODE BEGIN USB_DRD_FS_IRQn 0` block to redirect to `tud_int_handler(0); return;` *before* the HAL call. Don't remove that early return.
 4. **TinyUSB is vendored**, not a submodule — see [Middlewares/tinyusb/VERSION.txt](Middlewares/tinyusb/VERSION.txt) for the bump procedure.
+5. **Linker script is [BatteryMonitorV2.ld](BatteryMonitorV2.ld), not the CubeMX-generated `STM32C071XX_FLASH.ld`** (which is gitignored). The renamed copy carries two fixes documented in its header: `(READONLY)` stripped for ld.lld, and `.data` end aligned to 8 for STM32CubeProgrammer's DFU. The toolchain points at it via [cmake/starm-clang.cmake](cmake/starm-clang.cmake). After a CubeMX regen, the auto-generated `STM32C071XX_FLASH.ld` reappears locally — ignore it; merge layout changes into `BatteryMonitorV2.ld` manually if the chip ever changes.
 
 ## Conventions
 
 - **Interrupt priorities:** CM0+ has no `BASEPRI`; the X-CUBE-FREERTOS pack forces every IRQ with "Uses FreeRTOS functions" checked to priority 0 in CubeMX. Don't fight it. SysTick / PendSV / TIM2 (FreeRTOS-owned) stay at 3.
-- **Adding hand-written files:** add to `LINT_FILES` in [scripts/lint.py](scripts/lint.py). For testable modules, the production source path is auto-linked by Ceedling from the matching `test_<module>.c` filename — no extra config needed unless the module pulls in HAL symbols not yet stubbed in [test/support/](test/support/).
+- **Adding hand-written files:** add to `LINT_FILES` in [scripts/lint.py](scripts/lint.py) and either (a) create `test/test_<module>.c` (Ceedling auto-links the matching production source from the test filename) or (b) add the module to `TEST_EXEMPT` in [scripts/check_tests.py](scripts/check_tests.py) with a one-line reason. CI's `test_unit` job runs `check_tests.py` as the last step (after the Codecov upload, so coverage data still publishes) and fails the job if either is missing — without it, an unlinked module silently disappears from the Codecov report.
 - **Active-high I/O wrappers:** `enable` → `GPIO_PIN_SET`, `disable` → `GPIO_PIN_RESET`. If hardware inverts a signal, invert in the wrapper ([Core/Src/direct_io.c](Core/Src/direct_io.c)), never at the call site.
 - **Flash via DFU only.** SWD-only flags (`-hardRst`, `-rst`) on `STM32_Programmer_CLI` fail with a DFU connection. After flash completes, the user taps RESET (without holding BOOT0) to exit DFU and run the new firmware.
 
@@ -27,6 +28,7 @@ STM32C071 / FreeRTOS 11.2 (X-CUBE-FREERTOS pack, *not* legacy middleware) / Tiny
 | TinyUSB config | [Core/Inc/tusb_config.h](Core/Inc/tusb_config.h) |
 | Lint config | [.clang-tidy](.clang-tidy) (rule selection) + [scripts/lint.py](scripts/lint.py) (file list) |
 | Test config | [test/project.yml](test/project.yml) (Ceedling) |
+| Linker script | [BatteryMonitorV2.ld](BatteryMonitorV2.ld) (`STM32C071XX_FLASH.ld` is gitignored — see Hard rule 5) |
 | CI workflow | [.github/workflows/firmware-build.yml](../../../.github/workflows/firmware-build.yml) |
 | Telemetry parser | [scripts/telemetry_check.py](scripts/telemetry_check.py) |
 
