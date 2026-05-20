@@ -323,6 +323,61 @@ void test_read_current_ma_uses_cached_current_lsb(void)
     TEST_ASSERT_EQUAL_INT32(1220, ma);
 }
 
+/* ----- Failure propagation through the per-reading wrappers -----
+ *
+ * Every read_X wrapper has an identical early-return on the inner
+ * read_reg16 failure path. The cheapest way to hit that branch for all
+ * four wrappers is to make i2c_bus_lock return false - the failure
+ * cascades through read_reg16 -> do_mem_read -> ERR_BUS_BUSY without
+ * exercising any HAL or wait-complete mocks. These tests also assert
+ * the caller's out-param isn't clobbered on the failure path (the
+ * wrappers must not write through millivolts/microvolts/etc. before
+ * the early-return). */
+
+void test_read_bus_mv_propagates_failure_from_read_reg16(void)
+{
+    seed_device();
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, false);
+
+    uint32_t mv = 0xDEADBEEFU;
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_BUS_BUSY,
+        ina238_read_bus_mv(&s_dev, &mv));
+    TEST_ASSERT_EQUAL_UINT32(0xDEADBEEFU, mv);
+}
+
+void test_read_shunt_uv_propagates_failure_from_read_reg16(void)
+{
+    seed_device();
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, false);
+
+    int32_t uv = 0x5A5A5A5A;
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_BUS_BUSY,
+        ina238_read_shunt_uv(&s_dev, &uv));
+    TEST_ASSERT_EQUAL_INT32(0x5A5A5A5A, uv);
+}
+
+void test_read_die_temp_mc_propagates_failure_from_read_reg16(void)
+{
+    seed_device();
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, false);
+
+    int32_t mc = 0x12345678;
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_BUS_BUSY,
+        ina238_read_die_temp_mc(&s_dev, &mc));
+    TEST_ASSERT_EQUAL_INT32(0x12345678, mc);
+}
+
+void test_read_current_ma_propagates_failure_from_read_reg16(void)
+{
+    seed_device();
+    i2c_bus_lock_ExpectAndReturn(I2C_BUS_TIMEOUT_MS, false);
+
+    int32_t ma = 0x7FFFFFFF;
+    TEST_ASSERT_EQUAL_INT(INA238_ERR_BUS_BUSY,
+        ina238_read_current_ma(&s_dev, &ma));
+    TEST_ASSERT_EQUAL_INT32(0x7FFFFFFF, ma);
+}
+
 void test_read_reg16_returns_hal_error_when_post_dma_error_flag_set(void)
 {
     /* DMA wait succeeds but HAL_I2C_GetError reports a non-zero code
