@@ -279,7 +279,11 @@ void test_delay_unknown_message_returns_zero(void)
 /* ---------- ssd1306_init: probe failure -------------------------- */
 
 /* Probe failure (device doesn't ACK) must short-circuit init and
- * return SSD1306_ERR_PROBE without touching u8g2. */
+ * return SSD1306_ERR_PROBE without touching u8g2. ssd1306_u8g2()
+ * stays NULL because the init didn't complete. NB this test runs
+ * BEFORE the probe-success test below; once that one sets
+ * s_initialized=true the static stays set for the rest of the
+ * binary. */
 void test_ssd1306_init_returns_err_probe_on_no_ack(void)
 {
     HAL_I2C_IsDeviceReady_ExpectAndReturn(
@@ -289,4 +293,21 @@ void test_ssd1306_init_returns_err_probe_on_no_ack(void)
         50U,   /* SSD1306_PROBE_TIMEOUT_MS */
         HAL_ERROR);
     TEST_ASSERT_EQUAL_INT(SSD1306_ERR_PROBE, ssd1306_init(0x3CU));
+    TEST_ASSERT_NULL(ssd1306_u8g2());
+}
+
+/* Probe success: HAL_I2C_IsDeviceReady returns HAL_OK; u8g2 setup +
+ * init helpers are linked from test/support/u8g2_stubs.c so the
+ * post-probe path runs to completion. ssd1306_init returns OK and
+ * ssd1306_u8g2() now returns the module's instance pointer. */
+void test_ssd1306_init_succeeds_on_probe_ok(void)
+{
+    HAL_I2C_IsDeviceReady_ExpectAndReturn(
+        &hi2c2,
+        (uint16_t)(0x3CU << 1U),
+        3U,    /* SSD1306_PROBE_TRIES */
+        50U,   /* SSD1306_PROBE_TIMEOUT_MS */
+        HAL_OK);
+    TEST_ASSERT_EQUAL_INT(SSD1306_OK, ssd1306_init(0x3CU));
+    TEST_ASSERT_NOT_NULL(ssd1306_u8g2());
 }
