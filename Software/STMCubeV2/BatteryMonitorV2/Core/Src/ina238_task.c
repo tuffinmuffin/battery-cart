@@ -20,7 +20,6 @@
 #include "cmsis_os2.h"
 #include "direct_io.h"    /* relay_enable/disable for load-test toggle */
 #include "i2c.h"          /* hi2c1 */
-#include "i2c_bus.h"      /* i2c_bus_scan */
 #include "ina238.h"
 
 #include <string.h>
@@ -58,13 +57,6 @@ static void Ina238TaskBody(void *argument)
         .max_expected_current_ma = INA238_MAX_CURRENT_mA,
         .adc_range_low = false, /* ±163.84 mV range — enough for 40 A on 4 mΩ */
     };
-
-    /* One-shot bus scan — i2c_bus_scan formats into a caller buffer; the
-     * only stack-resident buffer left in this task. Sized for the
-     * worst-case address list. */
-    char scan_buf[160];
-    (void)i2c_bus_scan(&hi2c1, scan_buf, sizeof(scan_buf));
-    cdc_printf("%s\r\n", scan_buf);
 
     /* Diagnostic raw reads of the ID registers — bypasses probe()'s value
      * checks and just shows whatever the device returned. Differentiates:

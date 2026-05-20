@@ -62,7 +62,17 @@ jobs:
         run: cmake --build --preset ${{ matrix.preset }}
 
       - name: Memory budget check
-        run: python3 scripts/check_memory.py build/${{ matrix.preset }}/BatteryMonitorV2.elf --ram-limit 85 --flash-limit 85
+        # Release is the shipped artifact — gate it tight at 85 % so growth
+        # regressions surface immediately. Debug is dev-only and runs ~10 KB
+        # heavier from -Og + -g3 + larger function-call thunks; gate it at
+        # 95 % just to catch runaway, not to chase optimisation.
+        run: |
+          if [ "${{ matrix.preset }}" = "ci-Release" ]; then
+            FLASH_LIMIT=85
+          else
+            FLASH_LIMIT=95
+          fi
+          python3 scripts/check_memory.py build/${{ matrix.preset }}/BatteryMonitorV2.elf --ram-limit 85 --flash-limit "$FLASH_LIMIT"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

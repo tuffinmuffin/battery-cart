@@ -13,6 +13,8 @@ GPIO_TypeDef MCU_LED_GPIO_Port_storage    = {1};
 GPIO_TypeDef GPIO_K1_GPIO_Port_storage    = {2};
 GPIO_TypeDef GPIO_BLEED_GPIO_Port_storage = {3};
 GPIO_TypeDef FAN_PWM_GPIO_Port_storage    = {4};
+GPIO_TypeDef SW_A_GPIO_Port_storage       = {7};
+GPIO_TypeDef SW_B_GPIO_Port_storage       = {8};
 
 /* The real htim1 is allocated in Core/Src/tim.c; tests don't pull that file
  * in (it depends on real HAL types). Provide a zero-initialised placeholder

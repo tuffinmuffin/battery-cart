@@ -62,6 +62,21 @@ TEST_EXEMPT: dict[str, str] = {
     "Core/Src/stm32c0xx_it.c": (
         "Thin ISR forwarders to HAL / TinyUSB. Behaviour is verified on hardware."
     ),
+    "Core/Src/display_render.c": (
+        "Pure draw layer on top of u8g2 primitives. Host-testable in "
+        "principle (install a recording byte callback against the real "
+        "u8g2 engine) but high scaffolding cost vs the value while the "
+        "layout is still iterating. TODO: revisit when the SDL desktop "
+        "sim lands and brings the u8g2-on-host build with it."
+    ),
+    "Core/Src/display_task.c": (
+        "Bring-up placeholder — see TODO(replace) in the file header. "
+        "Charge-state machine will own the render dispatch, demo data "
+        "injection goes away, init/retry will likely move to a higher-"
+        "level display init coordinator. Don't add tests against this "
+        "surface; the API will change. File-level excluded from coverage "
+        "too (GCOVR_EXCL_FILE)."
+    ),
 }
 
 

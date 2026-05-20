@@ -36,18 +36,25 @@ extern GPIO_TypeDef MCU_LED_GPIO_Port_storage;
 extern GPIO_TypeDef GPIO_K1_GPIO_Port_storage;
 extern GPIO_TypeDef GPIO_BLEED_GPIO_Port_storage;
 extern GPIO_TypeDef FAN_PWM_GPIO_Port_storage;
+extern GPIO_TypeDef SW_A_GPIO_Port_storage;
+extern GPIO_TypeDef SW_B_GPIO_Port_storage;
 
 #define MCU_LED_GPIO_Port      (&MCU_LED_GPIO_Port_storage)
 #define GPIO_K1_GPIO_Port      (&GPIO_K1_GPIO_Port_storage)
 #define GPIO_BLEED_GPIO_Port   (&GPIO_BLEED_GPIO_Port_storage)
 #define FAN_PWM_GPIO_Port      (&FAN_PWM_GPIO_Port_storage)
+#define SW_A_GPIO_Port         (&SW_A_GPIO_Port_storage)
+#define SW_B_GPIO_Port         (&SW_B_GPIO_Port_storage)
 
 #define MCU_LED_Pin     ((uint16_t)0x8000U)  /* PC15 */
 #define GPIO_K1_Pin     ((uint16_t)0x0002U)  /* PA1 */
 #define GPIO_BLEED_Pin  ((uint16_t)0x0004U)  /* PA2 */
 #define FAN_PWM_Pin     ((uint16_t)0x0008U)  /* PA3 */
+#define SW_A_Pin        ((uint16_t)0x0020U)  /* PA5 */
+#define SW_B_Pin        ((uint16_t)0x0001U)  /* PB0 */
 
 void HAL_GPIO_WritePin(GPIO_TypeDef *port, uint16_t pin, GPIO_PinState state);
 void HAL_GPIO_TogglePin(GPIO_TypeDef *port, uint16_t pin);
+GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef *port, uint16_t pin);
 
 #endif /* MAIN_H */

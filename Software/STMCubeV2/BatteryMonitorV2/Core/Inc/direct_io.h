@@ -6,14 +6,19 @@
  *   GPIO_K1        PA1   push-pull output, active-high (relay K1 drive)
  *   GPIO_BLEED     PA2   push-pull output, active-high (bleed FET drive)
  *   FAN_PWM        PA3   TIM1_CH4 PWM output
+ *   SW_A           PA5   input, pulldown — front-panel switch A (active-high)
+ *   SW_B           PB0   input, pulldown — front-panel switch B (active-high)
  *
  * Active-high convention throughout: `enable` -> GPIO_PIN_SET, `disable` -> RESET.
- * If hardware inverts a signal, flip it here, not at the call site.
+ * `*_read()` returns true when the pin reads logical HIGH (switch pressed,
+ * pulldown means released = LOW). If hardware inverts a signal, flip it
+ * here, not at the call site.
  */
 
 #ifndef DIRECT_IO_H
 #define DIRECT_IO_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -24,6 +29,7 @@ extern "C" {
 void led_toggle(void);
 void led_enable(void);
 void led_disable(void);
+bool led_state(void);
 
 /* --- Relay K1 (PA1) --- */
 void relay_enable(void);
@@ -42,6 +48,10 @@ void bleed_disable(void);
  */
 void fan_init(void);
 void fan_set_duty(uint8_t percent);
+
+/* --- Switches (front-panel buttons, pulldown inputs) --- */
+bool sw_a_read(void);
+bool sw_b_read(void);
 
 #ifdef __cplusplus
 }

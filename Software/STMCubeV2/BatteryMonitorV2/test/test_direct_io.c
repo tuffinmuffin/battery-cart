@@ -102,3 +102,43 @@ void test_fan_set_duty_over_100_clamps_to_100(void)
     __HAL_TIM_SET_COMPARE_Expect(&htim1, TIM_CHANNEL_4, 1000U);
     fan_set_duty(250);
 }
+
+/* ----- LED state readback ----- */
+
+void test_led_state_returns_true_when_pin_high(void)
+{
+    HAL_GPIO_ReadPin_ExpectAndReturn(MCU_LED_GPIO_Port, MCU_LED_Pin, GPIO_PIN_SET);
+    TEST_ASSERT_TRUE(led_state());
+}
+
+void test_led_state_returns_false_when_pin_low(void)
+{
+    HAL_GPIO_ReadPin_ExpectAndReturn(MCU_LED_GPIO_Port, MCU_LED_Pin, GPIO_PIN_RESET);
+    TEST_ASSERT_FALSE(led_state());
+}
+
+/* ----- Switch inputs ----- */
+
+void test_sw_a_read_returns_true_when_pressed(void)
+{
+    HAL_GPIO_ReadPin_ExpectAndReturn(SW_A_GPIO_Port, SW_A_Pin, GPIO_PIN_SET);
+    TEST_ASSERT_TRUE(sw_a_read());
+}
+
+void test_sw_a_read_returns_false_when_released(void)
+{
+    HAL_GPIO_ReadPin_ExpectAndReturn(SW_A_GPIO_Port, SW_A_Pin, GPIO_PIN_RESET);
+    TEST_ASSERT_FALSE(sw_a_read());
+}
+
+void test_sw_b_read_returns_true_when_pressed(void)
+{
+    HAL_GPIO_ReadPin_ExpectAndReturn(SW_B_GPIO_Port, SW_B_Pin, GPIO_PIN_SET);
+    TEST_ASSERT_TRUE(sw_b_read());
+}
+
+void test_sw_b_read_returns_false_when_released(void)
+{
+    HAL_GPIO_ReadPin_ExpectAndReturn(SW_B_GPIO_Port, SW_B_Pin, GPIO_PIN_RESET);
+    TEST_ASSERT_FALSE(sw_b_read());
+}

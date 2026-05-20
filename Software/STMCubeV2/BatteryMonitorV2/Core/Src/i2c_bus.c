@@ -19,8 +19,6 @@
 #include "cmsis_os2.h"
 #include "i2c.h"   /* hi2c1 extern */
 
-#include <stdio.h>
-
 static osMutexId_t s_bus_mutex;
 static osSemaphoreId_t s_xfer_done;
 static bool s_initialised;
@@ -125,57 +123,3 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
     }
     (void)osSemaphoreRelease(s_xfer_done);
 }
-
-/* --- Bus scan ------------------------------------------------------------
- * HAL_I2C_IsDeviceReady does a polled START + addr + ACK check with no DMA
- * involvement. We sweep 0x08..0x77 (the general-purpose 7-bit range —
- * 0x00..0x07 and 0x78..0x7F are reserved by the I2C spec). Each call
- * holds the bus for at most `timeout_ms` if the address NACKs, much less
- * if it ACKs. With 10 ms per address and a sparse bus, expect ~1.1 s total.
- *
- * Coverage waiver: scan is a bringup / debug utility, not a runtime-critical
- * path. test_i2c_bus.c still exercises it as a functional regression check,
- * but the lines don't drag on the production coverage metric. Drop the
- * waiver if scan ever becomes part of a runtime health check.
- */
-
-/* GCOVR_EXCL_START */
-int i2c_bus_scan(void *hi2c, char *out, size_t out_size)
-{
-    if (out == NULL || out_size == 0) {
-        return 0;
-    }
-    /* Public API is opaque; the polled HAL call needs the typed handle. */
-    I2C_HandleTypeDef *handle = (I2C_HandleTypeDef *)hi2c;
-    if (!i2c_bus_lock(2000U)) {
-        (void)snprintf(out, out_size, "scan: bus busy");
-        return 0;
-    }
-
-    int found = 0;
-    size_t written = (size_t)snprintf(out, out_size, "scan:");
-
-    for (uint8_t addr = 0x08U; addr <= 0x77U; addr++) {
-        HAL_StatusTypeDef hs = HAL_I2C_IsDeviceReady(
-            handle, (uint16_t)(addr << 1), 1U, 10U);
-        if (hs != HAL_OK) {
-            continue;
-        }
-        found++;
-        if (written < out_size) {
-            int n = snprintf(out + written, out_size - written,
-                             " 0x%02X", (unsigned)addr);
-            if (n > 0) {
-                written += (size_t)n;
-            }
-        }
-    }
-
-    if (found == 0 && written < out_size) {
-        (void)snprintf(out + written, out_size - written, " (none)");
-    }
-
-    i2c_bus_unlock();
-    return found;
-}
-/* GCOVR_EXCL_STOP */
