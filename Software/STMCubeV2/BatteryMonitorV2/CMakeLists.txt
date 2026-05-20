@@ -42,6 +42,12 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined library search paths
 )
 
+# u8g2 vendored sources (csrc/ is engine + every display driver; stock-font
+# mega-files were intentionally not vendored — see Middlewares/u8g2/VERSION.txt).
+# GLOB is fine here: this is vendored code that only changes on a deliberate
+# version bump, and CONFIGURE_DEPENDS makes the generator re-glob each build.
+file(GLOB U8G2_SOURCES CONFIGURE_DEPENDS Middlewares/u8g2/csrc/*.c)
+
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Application
@@ -50,6 +56,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/i2c_bus.c
     Core/Src/ina238.c
     Core/Src/ina238_task.c
+    Core/Src/ssd1306.c
+    Core/Src/display_task.c
 
     # TinyUSB device-mode CDC ACM stack
     Core/Src/usb_descriptors.c
@@ -59,11 +67,16 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Middlewares/tinyusb/src/device/usbd_control.c
     Middlewares/tinyusb/src/class/cdc/cdc_device.c
     Middlewares/tinyusb/src/portable/st/stm32_fsdev/dcd_stm32_fsdev.c
+
+    # u8g2 monochrome graphics library (--gc-sections drops the ~100
+    # unused display dispatchers + helpers at link time)
+    ${U8G2_SOURCES}
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     Middlewares/tinyusb/src
+    Middlewares/u8g2/csrc
 )
 
 # Add project symbols (macros)

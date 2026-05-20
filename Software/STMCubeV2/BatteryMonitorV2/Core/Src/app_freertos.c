@@ -28,6 +28,7 @@
 #include "tusb.h"
 #include "cdc_print.h"
 #include "direct_io.h"
+#include "display_task.h"
 #include "i2c_bus.h"
 #include "ina238_task.h"
 #include <stdio.h>
@@ -116,6 +117,7 @@ void MX_FREERTOS_Init(void) {
   usbDeviceTaskHandle = osThreadNew(StartUsbDeviceTask, NULL, &usbDeviceTask_attributes);
   telemetryTaskHandle = osThreadNew(StartTelemetryTask, NULL, &telemetryTask_attributes);
   ina238_task_start();
+  display_task_start();
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
