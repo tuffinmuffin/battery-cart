@@ -1,14 +1,25 @@
 /**
- * display_render.h — pure render layer for the 128x32 OLED stats screen.
+ * display_render.h — pure render layer for the 128x32 OLED, dispatched
+ * by view ID.
  *
- * Stateless: takes a u8g2 instance, a charging-state label, a mode bit
- * (show V or A), and a monitor_snapshot_t. Paints the current "live
- * stats" screen via u8g2_FirstPage / u8g2_NextPage. No FreeRTOS, no
- * HAL, no globals beyond const fonts — the goal is that this same
- * function can be linked into the desktop SDL sim (tools/sim/) for
- * layout iteration without the firmware glue.
+ * Stateless functions, one logical per-view body. A single public
+ * entry point — display_render(u8g2, ctx) — switches on `ctx->view`
+ * and calls the right per-view helper. The caller (display_controller
+ * today, the future SDL sim) decides which view to render and supplies
+ * the view-specific context payload.
  *
- * Layout (128x32):
+ * Views — `display_view_t`:
+ *
+ *   DISPLAY_VIEW_MAIN          live stats (status label + V/A + tray)
+ *   DISPLAY_VIEW_ALT_THERMAL   thermal telem detail   (stub today)
+ *   DISPLAY_VIEW_ALT_COOLING   cooling / fan detail   (stub today)
+ *   DISPLAY_VIEW_ALT_BATTERY   battery info / NFC     (stub today)
+ *   DISPLAY_VIEW_MENU          settings / params menu (stub today)
+ *   DISPLAY_VIEW_IDLE          screensaver            (stub today)
+ *   DISPLAY_VIEW_FAULT         fault override         (stub today)
+ *   DISPLAY_VIEW_DEBUG         free-form debug text   (stub today)
+ *
+ * MAIN layout (128x32) — only fully-implemented view in v1:
  *
  *   .--------------------------------------------------------.
  *   | Charging                            13.5V  |  bm_font_15b
@@ -21,19 +32,14 @@
  *                                                                indicators +
  *                                                                heartbeat.
  *
- * The tray indicators are minimal and only appear when active:
- *   F — fan_duty_pct > 0
- *   K — k1_on
- *   B — bleed_on
+ * Tray indicators appear only when active:
+ *   F — fan_duty_pct > 0   K — k1_on   B — bleed_on
  *   ♥ — blinks in time with the MCU LED via led_state()
  *
- * The bottom-left slot alternates in sync with `show_voltage`:
- *   show_voltage == true  → "HH:MM:SS"  (formatted from charge_time_s)
- *   show_voltage == false → serial      (caller-supplied string)
- *
- * The caller (display_task or the SDL sim) decides which reading to
- * show, which status label to use, what charge_time_s value to use,
- * and what serial string to use — display_render just paints.
+ * The stub views each draw their name centered (big font) plus a
+ * "TODO" subtitle (small font) — they're reachable by button input
+ * (NEXT cycles through MAIN → ALT_*) so the dispatch can be eyeballed
+ * on hardware without faking state.
  */
 
 #ifndef DISPLAY_RENDER_H
@@ -49,28 +55,72 @@
 extern "C" {
 #endif
 
-/* Paint one full frame.
- *   `status_label`    — short string for the left side of the headline
- *                       ("Charging", "No Batt", "Trickle", etc.).
- *                       Pass NULL or "" to omit.
- *   `charge_time_s`   — seconds elapsed since charge start. Rendered
- *                       as "HH:MM:SS" in the bottom-left slot when
- *                       show_voltage is true. Wraps at 100 hours.
- *   `serial`          — battery serial string (e.g. "S/N: AB12CD34"
- *                       from a future NFC read) shown in the
- *                       bottom-left slot when show_voltage is false.
- *                       Pass NULL or "" to leave the slot blank.
- *   `show_voltage`    — true: render vbus on the right + timer on the
- *                       bottom-left; false: render current on the
- *                       right + serial on the bottom-left. Caller
- *                       toggles to alternate.
- *   `s`               — non-NULL snapshot from monitor_state_get(). */
-void display_render(u8g2_t *u8g2,
-                    const char *status_label,
-                    uint32_t charge_time_s,
-                    const char *serial,
-                    bool show_voltage,
-                    const monitor_snapshot_t *s);
+typedef enum {
+    DISPLAY_VIEW_MAIN = 0,
+    DISPLAY_VIEW_ALT_THERMAL,
+    DISPLAY_VIEW_ALT_COOLING,
+    DISPLAY_VIEW_ALT_BATTERY,
+    DISPLAY_VIEW_MENU,
+    DISPLAY_VIEW_IDLE,
+    DISPLAY_VIEW_FAULT,
+    DISPLAY_VIEW_DEBUG,
+    DISPLAY_VIEW_COUNT,
+} display_view_t;
+
+/* --- Per-view contexts --------------------------------------------
+ * Each view declares only the data it actually consumes. Adding a
+ * field to one view is local; adding a new view is one enum entry
+ * + one struct + one case in the dispatcher.
+ */
+
+/* MAIN — the headline view. Status label comes from
+ * display_state.h's map (caller maps a charge_state_t to a string).
+ * charge_pct: 0..100 means "show me", 0xFF means "hide" (no estimate
+ * available). */
+typedef struct {
+    const char *status_label;
+    uint32_t    charge_time_s;
+    const char *serial;
+    uint8_t     charge_pct;
+    bool        show_voltage;
+    const monitor_snapshot_t *snap;
+} display_main_ctx_t;
+
+typedef struct { const monitor_snapshot_t *snap; } display_thermal_ctx_t;
+typedef struct { const monitor_snapshot_t *snap; } display_cooling_ctx_t;
+typedef struct { const char *serial; }             display_battery_ctx_t;
+
+typedef struct {
+    uint8_t cursor;              /* highlighted item index */
+    uint8_t count;
+    const char *const *items;    /* item label array */
+} display_menu_ctx_t;
+
+typedef struct {
+    const char *code;            /* e.g. "OVERCURRENT" — required */
+    const char *detail;          /* nullable second line */
+} display_fault_ctx_t;
+
+typedef struct {
+    uint32_t frame;              /* monotonic for animation */
+} display_idle_ctx_t;
+
+typedef struct {
+    display_view_t view;
+    union {
+        display_main_ctx_t     main;
+        display_thermal_ctx_t  thermal;
+        display_cooling_ctx_t  cooling;
+        display_battery_ctx_t  battery;
+        display_menu_ctx_t     menu;
+        display_fault_ctx_t    fault;
+        display_idle_ctx_t     idle;
+    } u;
+} display_ctx_t;
+
+/* Single entry point — dispatches on ctx->view. Safe with NULL u8g2,
+ * NULL ctx, and any out-of-range view (all no-op). */
+void display_render(u8g2_t *u8g2, const display_ctx_t *ctx);
 
 #ifdef __cplusplus
 }
