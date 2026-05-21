@@ -261,6 +261,11 @@ uint8_t display_controller_menu_cursor(void)
     return s_state.menu_cursor;
 }
 
+void display_controller_force_view(display_view_t view)
+{
+    s_state.view = view;
+}
+
 bool display_controller_fault_active(void)
 {
     /* bool read is single-byte on Cortex-M; lock just to keep the
@@ -384,6 +389,16 @@ void display_controller_render(void)
     display_render(u8g2, &ctx);
 }
 
+/* GCOVR_EXCL_START
+ *
+ * controller_task_body is the FreeRTOS task entry — a `for(;;)` loop
+ * around startup-delay + probe-retry + tick/render. Untestable on the
+ * host: the infinite loop never returns to the test harness, the
+ * startup osDelay grace period serves no host-side purpose, and the
+ * tick/render bodies it calls are already covered individually by
+ * test_display_controller.c. Excluded from gcov so the file's coverage
+ * metric reflects the actually-tested state machine + render dispatch.
+ */
 static void controller_task_body(void *argument)
 {
     (void)argument;
@@ -415,6 +430,7 @@ static void controller_task_body(void *argument)
         osDelay(FRAME_INTERVAL_MS);
     }
 }
+/* GCOVR_EXCL_STOP */
 
 void display_controller_start(void)
 {

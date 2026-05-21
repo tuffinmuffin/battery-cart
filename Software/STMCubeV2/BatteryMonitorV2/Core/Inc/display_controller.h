@@ -75,6 +75,15 @@ bool display_controller_fault_active(void);
 void display_controller_set_fault(const char *code, const char *detail);
 void display_controller_clear_fault(void);
 
+/* TEST-ONLY — force the navigated view directly, bypassing the input/
+ * nav state machine. Used by unit tests to exercise the handle_event
+ * arms for IDLE / FAULT / DEBUG (and the matching render-switch arms),
+ * which exist today as scaffolding for future producers (idle-trigger
+ * detection, in-view fault acknowledge, debug toggle) that don't yet
+ * have a public path into those states. Production code must not call
+ * this — use the real producer APIs instead. */
+void display_controller_force_view(display_view_t view);
+
 #ifdef __cplusplus
 }
 #endif

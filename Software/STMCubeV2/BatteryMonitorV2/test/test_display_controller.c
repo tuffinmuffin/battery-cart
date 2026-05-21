@@ -285,6 +285,73 @@ void test_set_fault_null_code_keeps_string_empty(void)
      * but the fault_active flag is enough for the test contract. */
 }
 
+/* ---------- handle_event arms for IDLE / FAULT / DEBUG ----------
+ * These views aren't reachable from the current public input/nav
+ * path (no producer sets s_state.view to them yet), but their
+ * handle_event arms are scaffolding for the future fault-acknowledge
+ * + idle-screen-exit + debug-view-exit flows. Cover them via the
+ * test-only display_controller_force_view seam so the contract is
+ * pinned before producers land.
+ */
+
+void test_event_in_idle_returns_to_main(void)
+{
+    display_controller_force_view(DISPLAY_VIEW_IDLE);
+    tick_with_event(0U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+}
+
+/* Short-press in FAULT view returns to MAIN but leaves the fault
+ * active — the user has only acknowledged the screen, not the
+ * condition. Long-press both clears and exits (see next test). */
+void test_short_event_in_fault_returns_to_main_without_clearing(void)
+{
+    expect_fault_lock();
+    display_controller_set_fault("OVERCURRENT", NULL);
+    display_controller_force_view(DISPLAY_VIEW_FAULT);
+
+    tick_with_event(0U, DISPLAY_EVENT_NEXT_SHORT);
+
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+    expect_fault_lock();
+    TEST_ASSERT_TRUE(display_controller_fault_active());
+}
+
+/* Long-press in FAULT view = "acknowledge" — clears the fault AND
+ * returns to MAIN. Exercises the inner `if (view==FAULT &&
+ * e==NEXT_LONG)` branch in handle_event. CMock is in strict-order
+ * mode (test/project.yml), so the clear_fault mutex pair has to be
+ * registered between the two display_input_get_event calls — that's
+ * where it fires during tick. tick_with_event() can't express that
+ * interleaving, so this test inlines the expectations. */
+void test_long_event_in_fault_clears_and_returns_to_main(void)
+{
+    expect_fault_lock();
+    display_controller_set_fault("OVERCURRENT", NULL);
+    display_controller_force_view(DISPLAY_VIEW_FAULT);
+
+    /* Tick sequence: poll → get_event(true, NEXT_LONG) → handle_event
+     * runs clear_fault (acquire+release) → get_event(false). */
+    display_event_t e = DISPLAY_EVENT_NEXT_LONG;
+    display_input_poll_Expect(0U);
+    display_input_get_event_ExpectAnyArgsAndReturn(true);
+    display_input_get_event_ReturnThruPtr_out(&e);
+    expect_fault_lock();   /* clear_fault inside handle_event */
+    display_input_get_event_ExpectAnyArgsAndReturn(false);
+    display_controller_tick(0U);
+
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+    expect_fault_lock();
+    TEST_ASSERT_FALSE(display_controller_fault_active());
+}
+
+void test_event_in_debug_returns_to_main(void)
+{
+    display_controller_force_view(DISPLAY_VIEW_DEBUG);
+    tick_with_event(0U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+}
+
 /* ---------- Render path ----------
  * display_controller_render() is a no-op until ssd1306 is up, then
  * for each effective view it builds the ctx and calls display_render.
@@ -359,6 +426,30 @@ void test_render_menu_view(void)
 {
     tick_with_event(0U, DISPLAY_EVENT_SELECT_SHORT);
     TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MENU, display_controller_view());
+
+    ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
+    monitor_state_get_ExpectAnyArgs();
+    expect_fault_lock();
+    display_render_ExpectAnyArgs();
+    display_controller_render();
+}
+
+/* IDLE / DEBUG render dispatch — like the handle_event arms above,
+ * these are reachable only via the test seam today. */
+void test_render_idle_view(void)
+{
+    display_controller_force_view(DISPLAY_VIEW_IDLE);
+
+    ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
+    monitor_state_get_ExpectAnyArgs();
+    expect_fault_lock();
+    display_render_ExpectAnyArgs();
+    display_controller_render();
+}
+
+void test_render_debug_view(void)
+{
+    display_controller_force_view(DISPLAY_VIEW_DEBUG);
 
     ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
     monitor_state_get_ExpectAnyArgs();
