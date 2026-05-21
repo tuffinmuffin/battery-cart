@@ -28,7 +28,7 @@
 #include "tusb.h"
 #include "cdc_print.h"
 #include "direct_io.h"
-#include "display_task.h"
+#include "display_controller.h"
 #include "i2c_bus.h"
 #include "ina238_task.h"
 #include "monitor_state.h"
@@ -126,7 +126,7 @@ void MX_FREERTOS_Init(void) {
    * waking this CDC-noisy logger. Re-enable when we want telemetry on
    * the CDC port for debugging. */
   /* ina238_task_start(); */
-  display_task_start();
+  display_controller_start();
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
