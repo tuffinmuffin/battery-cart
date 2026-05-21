@@ -81,9 +81,9 @@ static const osThreadAttr_t s_task_attr = {
 /* Find the index of `view` in kCycleOrder, or 0 if not found. */
 static uint8_t cycle_index_of(display_view_t view)
 {
-    for (uint8_t i = 0; i < CYCLE_LEN; i++) {
+    for (size_t i = 0; i < CYCLE_LEN; i++) {
         if (kCycleOrder[i] == view) {
-            return i;
+            return (uint8_t)i;
         }
     }
     return 0;
