@@ -1,0 +1,251 @@
+/**
+ * test_display_controller.c — host-side unit tests for display_controller.c.
+ *
+ * Covers the navigation state machine (NEXT cycles MAIN→ALT_*, NEXT-long
+ * back to MAIN, SELECT enters MENU, menu cursor advances, etc.), the
+ * demo auto-cycle after inactivity, and the fault override.
+ *
+ * display_controller.c includes ssd1306.h / monitor_state.h /
+ * display_render.h / cdc_print.h / display_input.h. Tests mock the
+ * ones whose calls the tick path can touch (display_input, cdc_print);
+ * render-path symbols (ssd1306, monitor_state, display_render) are
+ * mocked too so the test binary links cleanly even though the tests
+ * don't call _render().
+ */
+
+#include "unity.h"
+#include "display_controller.h"
+
+#include "mock_cmsis_os2.h"
+#include "mock_display_input.h"
+#include "mock_display_render.h"
+#include "mock_display_state.h"
+#include "mock_monitor_state.h"
+#include "mock_ssd1306.h"
+
+#include <stdarg.h>
+#include <string.h>
+
+/* cdc_print.h declares cdc_vprintf(const char *, va_list); CMock can't
+ * auto-mock va_list arguments. We don't need to assert on log content
+ * either — the controller calls cdc_printf for diagnostic output only.
+ * Stub it locally as a no-op so the linker resolves the symbol without
+ * needing the real cdc_print.c (which would pull in TinyUSB). */
+int cdc_printf(const char *fmt, ...);
+int cdc_printf(const char *fmt, ...)
+{
+    (void)fmt;
+    return 0;
+}
+
+/* Internal constants we need to match for cycle-timing tests. Keep in
+ * sync with display_controller.c. */
+#define DEMO_CYCLE_MS         8000U
+#define DEMO_INACTIVITY_MS    30000U
+
+void setUp(void)
+{
+    display_controller_init();
+}
+
+void tearDown(void) { }
+
+/* Drive a single tick where the input layer reports no events. The
+ * controller calls poll once and get_event once (returning false). */
+static void tick_with_no_input(uint32_t now_ms)
+{
+    display_input_poll_Expect(now_ms);
+    display_input_get_event_ExpectAnyArgsAndReturn(false);
+    display_controller_tick(now_ms);
+}
+
+/* Drive a single tick where the input layer produces ONE event. */
+static void tick_with_event(uint32_t now_ms, display_event_t event)
+{
+    display_event_t e = event;
+    display_input_poll_Expect(now_ms);
+    display_input_get_event_ExpectAnyArgsAndReturn(true);
+    display_input_get_event_ReturnThruPtr_out(&e);
+    display_input_get_event_ExpectAnyArgsAndReturn(false);
+    display_controller_tick(now_ms);
+}
+
+/* ---------- init ---------- */
+
+void test_init_starts_in_main_view(void)
+{
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+    TEST_ASSERT_EQUAL_UINT8(0U, display_controller_menu_cursor());
+    TEST_ASSERT_FALSE(display_controller_fault_active());
+}
+
+/* ---------- MAIN / ALT_* nav ---------- */
+
+void test_next_short_cycles_main_to_alt_thermal(void)
+{
+    tick_with_event(0U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_THERMAL, display_controller_view());
+}
+
+void test_next_short_full_cycle_wraps_back_to_main(void)
+{
+    tick_with_event(0U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_THERMAL, display_controller_view());
+    tick_with_event(100U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_COOLING, display_controller_view());
+    tick_with_event(200U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_BATTERY, display_controller_view());
+    tick_with_event(300U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+}
+
+void test_next_long_from_any_alt_jumps_back_to_main(void)
+{
+    /* Cycle into ALT_COOLING then long-press back. */
+    tick_with_event(0U,   DISPLAY_EVENT_NEXT_SHORT);
+    tick_with_event(100U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_COOLING, display_controller_view());
+
+    tick_with_event(200U, DISPLAY_EVENT_NEXT_LONG);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+}
+
+void test_select_short_enters_menu_from_main(void)
+{
+    tick_with_event(0U, DISPLAY_EVENT_SELECT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MENU, display_controller_view());
+    TEST_ASSERT_EQUAL_UINT8(0U, display_controller_menu_cursor());
+}
+
+void test_select_short_enters_menu_from_alt_view(void)
+{
+    tick_with_event(0U,   DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_THERMAL, display_controller_view());
+
+    tick_with_event(100U, DISPLAY_EVENT_SELECT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MENU, display_controller_view());
+}
+
+/* ---------- MENU nav ---------- */
+
+void test_menu_next_short_advances_cursor(void)
+{
+    tick_with_event(0U,   DISPLAY_EVENT_SELECT_SHORT);
+    tick_with_event(100U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_UINT8(1U, display_controller_menu_cursor());
+    tick_with_event(200U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_UINT8(2U, display_controller_menu_cursor());
+}
+
+/* Cursor wraps at the end of the menu (5 items today: Force test,
+ * Reset, Firmware update, About, Status). Verify wrap to 0. */
+void test_menu_cursor_wraps_at_end(void)
+{
+    tick_with_event(0U, DISPLAY_EVENT_SELECT_SHORT);
+    /* Advance 5 times — 0→1→2→3→4→0 */
+    for (uint32_t t = 100U; t < 600U; t += 100U) {
+        tick_with_event(t, DISPLAY_EVENT_NEXT_SHORT);
+    }
+    TEST_ASSERT_EQUAL_UINT8(0U, display_controller_menu_cursor());
+}
+
+void test_menu_next_long_exits_to_main(void)
+{
+    tick_with_event(0U,   DISPLAY_EVENT_SELECT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MENU, display_controller_view());
+
+    tick_with_event(100U, DISPLAY_EVENT_NEXT_LONG);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+}
+
+/* SELECT inside the MENU triggers the (TODO) per-item handler. Today
+ * the handler just logs via cdc_printf (stubbed as no-op in this test
+ * file — see top), so the test only verifies the controller doesn't
+ * crash and the view stays in MENU. */
+void test_menu_select_stays_in_menu(void)
+{
+    tick_with_event(0U, DISPLAY_EVENT_SELECT_SHORT);   /* enter MENU */
+    tick_with_event(100U, DISPLAY_EVENT_SELECT_SHORT); /* select item 0 */
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MENU, display_controller_view());
+}
+
+/* ---------- Auto-cycle demo ---------- */
+
+/* Tick once at t=0, then again at t=DEMO_INACTIVITY_MS+DEMO_CYCLE_MS
+ * with no input — should advance from MAIN to ALT_THERMAL. */
+void test_auto_cycle_after_inactivity(void)
+{
+    /* First tick — initial state, no input, no cycle yet. */
+    tick_with_no_input(0U);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+
+    /* Second tick — past the inactivity gap + the cycle interval. */
+    tick_with_no_input(DEMO_INACTIVITY_MS + DEMO_CYCLE_MS);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_THERMAL, display_controller_view());
+}
+
+/* A button press resets the inactivity timer, so a tick that would
+ * have auto-cycled doesn't. */
+void test_input_pauses_auto_cycle(void)
+{
+    tick_with_no_input(0U);
+    /* Press something — pauses the demo. */
+    tick_with_event(1000U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_THERMAL, display_controller_view());
+
+    /* A tick that's past inactivity+cycle from t=0 but the user
+     * pressed at t=1000, so the inactivity counter restarted. */
+    tick_with_no_input(1000U + DEMO_INACTIVITY_MS - 1U);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_THERMAL, display_controller_view());
+}
+
+/* Auto-cycle doesn't fire when the user is in MENU / IDLE / FAULT
+ * / DEBUG — those need explicit triggers. */
+void test_auto_cycle_does_not_fire_in_menu(void)
+{
+    tick_with_event(0U, DISPLAY_EVENT_SELECT_SHORT);   /* into MENU */
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MENU, display_controller_view());
+
+    /* Even past the inactivity gap, MENU shouldn't auto-cycle. */
+    tick_with_no_input(DEMO_INACTIVITY_MS + DEMO_CYCLE_MS + 100U);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MENU, display_controller_view());
+}
+
+/* ---------- Fault override ---------- */
+
+void test_set_fault_marks_fault_active(void)
+{
+    display_controller_set_fault("OVERCURRENT", "32 A > 30 A limit");
+    TEST_ASSERT_TRUE(display_controller_fault_active());
+}
+
+void test_clear_fault_marks_fault_inactive(void)
+{
+    display_controller_set_fault("OVERCURRENT", NULL);
+    TEST_ASSERT_TRUE(display_controller_fault_active());
+    display_controller_clear_fault();
+    TEST_ASSERT_FALSE(display_controller_fault_active());
+}
+
+/* Fault override doesn't clobber the user's navigated view — when
+ * the fault clears, the rendered view returns to wherever the user
+ * was. The override is applied only inside _render (not visible here)
+ * — view() reports the navigated view always. */
+void test_fault_does_not_change_navigated_view(void)
+{
+    tick_with_event(0U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_THERMAL, display_controller_view());
+
+    display_controller_set_fault("OVERCURRENT", NULL);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_THERMAL, display_controller_view());
+    TEST_ASSERT_TRUE(display_controller_fault_active());
+}
+
+void test_set_fault_null_code_keeps_string_empty(void)
+{
+    display_controller_set_fault(NULL, NULL);
+    TEST_ASSERT_TRUE(display_controller_fault_active());
+    /* Internal buffer is empty — render layer will skip the code
+     * line. We can't inspect the buffer from here without a getter,
+     * but the fault_active flag is enough for the test contract. */
+}

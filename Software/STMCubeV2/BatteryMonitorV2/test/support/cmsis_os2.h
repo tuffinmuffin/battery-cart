@@ -71,4 +71,6 @@ osThreadId_t osThreadNew(osThreadFunc_t func, void *argument,
                          const osThreadAttr_t *attr);
 void osDelay(uint32_t ticks);
 
+uint32_t osKernelGetTickCount(void);
+
 #endif /* CMSIS_OS2_H */
