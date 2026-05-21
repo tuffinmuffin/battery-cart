@@ -75,13 +75,17 @@ static void draw_heart(u8g2_t *u8g2, uint8_t x, uint8_t y)
 }
 
 /* Compute the x offset that horizontally centers `str` rendered with
- * the currently-set font. Falls back to 0 if the string is wider
- * than the panel. */
+ * the currently-set font. Caps the apparent string width at 127 so
+ * the (128 - w) / 2 math always yields a sane non-negative offset —
+ * a wider-than-panel string draws from x=0 (still overhangs, but that
+ * surfaces the layout bug rather than wrapping into garbage). Not
+ * reachable today (the stub view names all fit), but worth being
+ * defensive if string sources widen later. */
 static u8g2_uint_t centered_x(u8g2_t *u8g2, const char *str)
 {
     u8g2_uint_t w = u8g2_GetStrWidth(u8g2, str);
-    if (w >= 128U) {
-        return 0;
+    if (w > 127U) {
+        w = 127U;
     }
     return (u8g2_uint_t)((128U - w) / 2U);
 }
@@ -110,16 +114,23 @@ static void render_main_view(u8g2_t *u8g2, const display_main_ctx_t *m)
                        (unsigned long)((s->vbus_mv % 1000U) / 100U));
     } else {
         unit = "A";
-        long ma = (long)s->current_ma;
+        const int32_t i_ma = s->current_ma;
         char sign = ' ';
-        if (ma < 0) {
+        /* Take the magnitude through unsigned arithmetic so INT32_MIN
+         * doesn't trip signed-overflow UB on `-ma`. Unsigned negation
+         * is defined for every input. (Not reachable on the 10 A shunt
+         * today, but trivial to make robust.) */
+        uint32_t mag;
+        if (i_ma < 0) {
             sign = '-';
-            ma = -ma;
+            mag = -(uint32_t)i_ma;
+        } else {
+            mag = (uint32_t)i_ma;
         }
-        (void)snprintf(reading, sizeof(reading), "%c%ld.%ld",
+        (void)snprintf(reading, sizeof(reading), "%c%lu.%lu",
                        sign,
-                       ma / 1000,
-                       (ma % 1000) / 100);
+                       (unsigned long)(mag / 1000U),
+                       (unsigned long)((mag % 1000U) / 100U));
     }
 
     /* Bottom-left slot — timer when show_voltage is true, serial when

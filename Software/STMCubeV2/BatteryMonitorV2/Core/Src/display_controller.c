@@ -418,6 +418,13 @@ static void controller_task_body(void *argument)
 
 void display_controller_start(void)
 {
+    /* Idempotent: skip if the task already exists. Boot-only path
+     * today, but a future restart-on-fault or watchdog flow could
+     * land here twice; without the guard the second osThreadNew
+     * would leak the prior handle (and waste another 1 KB stack). */
+    if (s_task_handle != NULL) {
+        return;
+    }
     display_controller_init();
     display_input_init();
     s_task_handle = osThreadNew(controller_task_body, NULL, &s_task_attr);

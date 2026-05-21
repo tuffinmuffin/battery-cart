@@ -396,10 +396,15 @@ void test_render_fault_override_null_detail(void)
 }
 
 /* ---------- display_controller_start ----------
- * Production entry point — init, input_init, spawn the task. We mock
- * the task spawn so the test doesn't try to run a real FreeRTOS loop.
- */
-void test_start_calls_init_input_init_and_spawns_task(void)
+ * First call: init + input_init + spawn the task. Subsequent calls
+ * must early-return — s_task_handle is a file-scope static, so once
+ * spawn succeeds the guard prevents a leaked second task. Both
+ * behaviours are tested in one case because s_task_handle persists
+ * across tests in the binary (it's the same static), so splitting
+ * would mean either: a stale handle leaks the contract between
+ * tests, or we need a test-only reset hook. Combining keeps the
+ * production code clean. */
+void test_start_first_call_spawns_task_subsequent_calls_are_noop(void)
 {
     display_input_init_Expect();
     osThreadNew_ExpectAnyArgsAndReturn((osThreadId_t)0x1234);
@@ -407,6 +412,12 @@ void test_start_calls_init_input_init_and_spawns_task(void)
 
     /* _start also calls _init internally — view should be MAIN. */
     TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+
+    /* Second + third calls: no new expectations. If start fails to
+     * short-circuit it'll call display_input_init / osThreadNew and
+     * CMock will flag the unexpected call as a test failure. */
+    display_controller_start();
+    display_controller_start();
 }
 
 /* ---------- Fault mutex serialisation ----------
