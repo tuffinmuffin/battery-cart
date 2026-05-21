@@ -46,7 +46,13 @@ void display_controller_tick(uint32_t now_ms);
 
 /* Render the current effective view (fault override applied) using
  * the live monitor_state snapshot + the demo data sweep. No-op if
- * ssd1306 hasn't been initialised yet. */
+ * ssd1306 hasn't been initialised yet.
+ *
+ * TEMP: today the live monitor_state snapshot is unconditionally
+ * overwritten by a synthesised demo sweep (see inject_demo_data in
+ * display_controller.c). When a real producer wires up to
+ * monitor_state, drop the demo block — until then, real INA238
+ * values will NOT appear on screen even if the producer is running. */
 void display_controller_render(void);
 
 /* Current navigated view ID (ignores fault override). */

@@ -42,13 +42,37 @@ int cdc_printf(const char *fmt, ...)
  * sync with display_controller.c. */
 #define DEMO_CYCLE_MS         8000U
 #define DEMO_INACTIVITY_MS    30000U
+#define FAULT_LOCK_MS         100U
+
+/* Sentinel mutex handle. CMock matches by value, so any non-NULL works.
+ * Static across the whole test binary because s_fault_mutex inside
+ * display_controller.c is itself a file-scope static (first init() call
+ * wins, subsequent inits skip osMutexNew). */
+static int s_mutex_storage;
+#define FAKE_MUTEX ((osMutexId_t)&s_mutex_storage)
 
 void setUp(void)
 {
+    /* osMutexNew is only called the first time display_controller_init
+     * runs (s_fault_mutex is a file-scope static — it persists across
+     * tests). _Ignore covers both the first real call and the no-op
+     * subsequent ones without polluting per-test expectation order. */
+    osMutexNew_IgnoreAndReturn(FAKE_MUTEX);
     display_controller_init();
 }
 
 void tearDown(void) { }
+
+/* Each set_fault / clear_fault / fault_active call takes the lock
+ * exactly once. Render also takes it once on every call (to snapshot
+ * the fault buffers). CMock won't let Ignore + Expect coexist on the
+ * same function, so we register the acquire/release pair concretely
+ * for every fault-touching operation. */
+static void expect_fault_lock(void)
+{
+    osMutexAcquire_ExpectAndReturn(FAKE_MUTEX, FAULT_LOCK_MS, osOK);
+    osMutexRelease_ExpectAndReturn(FAKE_MUTEX, osOK);
+}
 
 /* Drive a single tick where the input layer reports no events. The
  * controller calls poll once and get_event once (returning false). */
@@ -76,6 +100,7 @@ void test_init_starts_in_main_view(void)
 {
     TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
     TEST_ASSERT_EQUAL_UINT8(0U, display_controller_menu_cursor());
+    expect_fault_lock();
     TEST_ASSERT_FALSE(display_controller_fault_active());
 }
 
@@ -215,15 +240,21 @@ void test_auto_cycle_does_not_fire_in_menu(void)
 
 void test_set_fault_marks_fault_active(void)
 {
+    expect_fault_lock();
     display_controller_set_fault("OVERCURRENT", "32 A > 30 A limit");
+    expect_fault_lock();
     TEST_ASSERT_TRUE(display_controller_fault_active());
 }
 
 void test_clear_fault_marks_fault_inactive(void)
 {
+    expect_fault_lock();
     display_controller_set_fault("OVERCURRENT", NULL);
+    expect_fault_lock();
     TEST_ASSERT_TRUE(display_controller_fault_active());
+    expect_fault_lock();
     display_controller_clear_fault();
+    expect_fault_lock();
     TEST_ASSERT_FALSE(display_controller_fault_active());
 }
 
@@ -236,14 +267,18 @@ void test_fault_does_not_change_navigated_view(void)
     tick_with_event(0U, DISPLAY_EVENT_NEXT_SHORT);
     TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_THERMAL, display_controller_view());
 
+    expect_fault_lock();
     display_controller_set_fault("OVERCURRENT", NULL);
     TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_THERMAL, display_controller_view());
+    expect_fault_lock();
     TEST_ASSERT_TRUE(display_controller_fault_active());
 }
 
 void test_set_fault_null_code_keeps_string_empty(void)
 {
+    expect_fault_lock();
     display_controller_set_fault(NULL, NULL);
+    expect_fault_lock();
     TEST_ASSERT_TRUE(display_controller_fault_active());
     /* Internal buffer is empty — render layer will skip the code
      * line. We can't inspect the buffer from here without a getter,
@@ -275,6 +310,7 @@ void test_render_main_view(void)
     /* Fresh init → view = MAIN; render walks the MAIN ctx-build path. */
     ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
     monitor_state_get_ExpectAnyArgs();
+    expect_fault_lock();
     display_label_for_state_ExpectAnyArgsAndReturn("Charging");
     display_render_ExpectAnyArgs();
     display_controller_render();
@@ -287,6 +323,7 @@ void test_render_alt_thermal_view(void)
 
     ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
     monitor_state_get_ExpectAnyArgs();
+    expect_fault_lock();
     display_render_ExpectAnyArgs();
     display_controller_render();
 }
@@ -299,6 +336,7 @@ void test_render_alt_cooling_view(void)
 
     ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
     monitor_state_get_ExpectAnyArgs();
+    expect_fault_lock();
     display_render_ExpectAnyArgs();
     display_controller_render();
 }
@@ -312,6 +350,7 @@ void test_render_alt_battery_view(void)
 
     ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
     monitor_state_get_ExpectAnyArgs();
+    expect_fault_lock();
     display_render_ExpectAnyArgs();
     display_controller_render();
 }
@@ -323,6 +362,7 @@ void test_render_menu_view(void)
 
     ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
     monitor_state_get_ExpectAnyArgs();
+    expect_fault_lock();
     display_render_ExpectAnyArgs();
     display_controller_render();
 }
@@ -331,10 +371,12 @@ void test_render_menu_view(void)
  * picks FAULT as the effective view and builds the fault ctx. */
 void test_render_fault_override(void)
 {
+    expect_fault_lock();
     display_controller_set_fault("OVERCURRENT", "32 A > 30 A");
 
     ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
     monitor_state_get_ExpectAnyArgs();
+    expect_fault_lock();
     display_render_ExpectAnyArgs();
     display_controller_render();
 }
@@ -343,10 +385,12 @@ void test_render_fault_override(void)
  * field NULL — exercises the conditional in the FAULT case. */
 void test_render_fault_override_null_detail(void)
 {
+    expect_fault_lock();
     display_controller_set_fault("FAULT", NULL);
 
     ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
     monitor_state_get_ExpectAnyArgs();
+    expect_fault_lock();
     display_render_ExpectAnyArgs();
     display_controller_render();
 }
@@ -363,4 +407,47 @@ void test_start_calls_init_input_init_and_spawns_task(void)
 
     /* _start also calls _init internally — view should be MAIN. */
     TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+}
+
+/* ---------- Fault mutex serialisation ----------
+ * Producers can call set_fault from a separate task (charge controller
+ * / safety monitor) while the display task is mid-render. Without
+ * serialisation the reader could observe a torn fault_code buffer
+ * (strncpy isn't atomic). All fault-touching tests above register
+ * acquire/release pairs via expect_fault_lock(); this one pins the
+ * contract for the lock-acquire-failure path specifically.
+ */
+void test_set_fault_drops_when_lock_times_out(void)
+{
+    /* Acquire fails → set_fault returns early without writing the
+     * buffers or matching release. fault_active stays false. */
+    osMutexAcquire_ExpectAndReturn(FAKE_MUTEX, FAULT_LOCK_MS, osErrorTimeout);
+    display_controller_set_fault("OVERCURRENT", NULL);
+
+    expect_fault_lock();
+    TEST_ASSERT_FALSE(display_controller_fault_active());
+}
+
+void test_clear_fault_drops_when_lock_times_out(void)
+{
+    /* Pre-set a fault successfully (acquire+release pair). */
+    expect_fault_lock();
+    display_controller_set_fault("OVERCURRENT", NULL);
+
+    /* clear_fault's acquire fails → fault stays active. */
+    osMutexAcquire_ExpectAndReturn(FAKE_MUTEX, FAULT_LOCK_MS, osErrorTimeout);
+    display_controller_clear_fault();
+
+    expect_fault_lock();
+    TEST_ASSERT_TRUE(display_controller_fault_active());
+}
+
+void test_fault_active_returns_false_when_lock_times_out(void)
+{
+    expect_fault_lock();
+    display_controller_set_fault("OVERCURRENT", NULL);
+
+    /* fault_active's acquire fails → defaults to false. */
+    osMutexAcquire_ExpectAndReturn(FAKE_MUTEX, FAULT_LOCK_MS, osErrorTimeout);
+    TEST_ASSERT_FALSE(display_controller_fault_active());
 }

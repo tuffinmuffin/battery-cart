@@ -32,6 +32,7 @@
 
 #define FAULT_CODE_LEN           32U
 #define FAULT_DETAIL_LEN         64U
+#define FAULT_LOCK_MS            100U   /* matches monitor_state pattern */
 
 typedef struct {
     display_view_t  view;
@@ -45,6 +46,16 @@ typedef struct {
 } controller_state_t;
 
 static controller_state_t s_state;
+
+/* Fault fields (active flag + code/detail buffers) are written by a
+ * future charge controller / safety monitor task and read by the
+ * display task in _render. Without serialisation the reader can see a
+ * torn string mid-strncpy. Mirrors monitor_state's pattern. */
+static osMutexId_t s_fault_mutex;
+static const osMutexAttr_t s_fault_mutex_attr = {
+    .name      = "display_fault",
+    .attr_bits = osMutexPrioInherit,
+};
 
 /* Menu items — placeholder labels for the design's menu structure.
  * Selecting any item today just logs to CDC; real handlers
@@ -197,10 +208,17 @@ void display_controller_init(void)
 {
     (void)memset(&s_state, 0, sizeof(s_state));
     s_state.view = DISPLAY_VIEW_MAIN;
+    if (s_fault_mutex == NULL) {
+        s_fault_mutex = osMutexNew(&s_fault_mutex_attr);
+    }
 }
 
 void display_controller_set_fault(const char *code, const char *detail)
 {
+    if (s_fault_mutex != NULL &&
+        osMutexAcquire(s_fault_mutex, FAULT_LOCK_MS) != osOK) {
+        return;
+    }
     s_state.fault_active = true;
     if (code != NULL) {
         (void)strncpy(s_state.fault_code, code, FAULT_CODE_LEN - 1U);
@@ -214,13 +232,23 @@ void display_controller_set_fault(const char *code, const char *detail)
     } else {
         s_state.fault_detail[0] = '\0';
     }
+    if (s_fault_mutex != NULL) {
+        (void)osMutexRelease(s_fault_mutex);
+    }
 }
 
 void display_controller_clear_fault(void)
 {
+    if (s_fault_mutex != NULL &&
+        osMutexAcquire(s_fault_mutex, FAULT_LOCK_MS) != osOK) {
+        return;
+    }
     s_state.fault_active = false;
     s_state.fault_code[0] = '\0';
     s_state.fault_detail[0] = '\0';
+    if (s_fault_mutex != NULL) {
+        (void)osMutexRelease(s_fault_mutex);
+    }
 }
 
 display_view_t display_controller_view(void)
@@ -235,7 +263,19 @@ uint8_t display_controller_menu_cursor(void)
 
 bool display_controller_fault_active(void)
 {
-    return s_state.fault_active;
+    /* bool read is single-byte on Cortex-M; lock just to keep the
+     * "all fault-field access goes through the mutex" invariant
+     * consistent (and so this returns false the instant the writer
+     * is mid-clear, not a half-stale true). */
+    if (s_fault_mutex != NULL &&
+        osMutexAcquire(s_fault_mutex, FAULT_LOCK_MS) != osOK) {
+        return false;
+    }
+    const bool active = s_state.fault_active;
+    if (s_fault_mutex != NULL) {
+        (void)osMutexRelease(s_fault_mutex);
+    }
+    return active;
 }
 
 void display_controller_tick(uint32_t now_ms)
@@ -263,6 +303,12 @@ void display_controller_tick(uint32_t now_ms)
                 break;
         }
     }
+
+    /* Demo sweep counter lives here (not in _render) so _render stays
+     * a pure draw — a future force-refresh that calls _render twice
+     * between ticks won't double-advance the demo. TEMP: rip when the
+     * real producer wires up. */
+    s_state.demo_frame++;
 }
 
 void display_controller_render(void)
@@ -275,13 +321,30 @@ void display_controller_render(void)
     monitor_snapshot_t snap;
     monitor_state_get(&snap);
     inject_demo_data(&snap);   /* TEMP — rip when real producer lands */
-    s_state.demo_frame++;
+
+    /* Snapshot the fault state under the lock into render-task-local
+     * scratch so the actual draw runs without holding the lock and
+     * a producer's strncpy can't race us mid-build. */
+    bool effective_fault = false;
+    char fault_code[FAULT_CODE_LEN]   = {0};
+    char fault_detail[FAULT_DETAIL_LEN] = {0};
+    if (s_fault_mutex == NULL ||
+        osMutexAcquire(s_fault_mutex, FAULT_LOCK_MS) == osOK) {
+        effective_fault = s_state.fault_active;
+        if (effective_fault) {
+            (void)memcpy(fault_code,   s_state.fault_code,   FAULT_CODE_LEN);
+            (void)memcpy(fault_detail, s_state.fault_detail, FAULT_DETAIL_LEN);
+        }
+        if (s_fault_mutex != NULL) {
+            (void)osMutexRelease(s_fault_mutex);
+        }
+    }
 
     /* Fault override picks the rendered view, but doesn't clobber
      * s_state.view (so we return to the user's view when the fault
      * is acked). */
     const display_view_t effective_view =
-        s_state.fault_active ? DISPLAY_VIEW_FAULT : s_state.view;
+        effective_fault ? DISPLAY_VIEW_FAULT : s_state.view;
 
     display_ctx_t ctx;
     ctx.view = effective_view;
@@ -309,10 +372,8 @@ void display_controller_render(void)
             ctx.u.idle.frame = s_state.demo_frame;
             break;
         case DISPLAY_VIEW_FAULT:
-            ctx.u.fault.code   = s_state.fault_code;
-            ctx.u.fault.detail = s_state.fault_detail[0] != '\0'
-                                   ? s_state.fault_detail
-                                   : NULL;
+            ctx.u.fault.code   = fault_code;
+            ctx.u.fault.detail = fault_detail[0] != '\0' ? fault_detail : NULL;
             break;
         case DISPLAY_VIEW_DEBUG:
         default:
