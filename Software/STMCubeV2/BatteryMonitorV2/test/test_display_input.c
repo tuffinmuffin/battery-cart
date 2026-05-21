@@ -223,6 +223,39 @@ void test_next_long_fires_only_once_per_hold(void)
     TEST_ASSERT_FALSE(display_input_get_event(&e));
 }
 
+/* Poll-gap recovery: if the controller skipped polling for the
+ * whole hold (e.g. preempted task) the during-hold long-press
+ * check never runs. The falling-edge classifier still sees
+ * held >= LONG_PRESS_MS with long_fired == false and queues
+ * LONG on release — so the event isn't lost.
+ *
+ * Sequence: press confirmed at t=40, no polls during the hold,
+ * release detected at t=920 → held=880 → LONG via release path. */
+void test_next_long_release_with_no_held_poll_fires_long(void)
+{
+    expect_poll(false, false);
+    display_input_poll(0U);
+
+    expect_poll(true, false);
+    display_input_poll(10U);
+
+    expect_poll(true, false);
+    display_input_poll(40U);    /* press edge confirmed */
+
+    /* No polls between t=40 and the release. */
+    expect_poll(false, false);
+    display_input_poll(900U);   /* raw release; debounce starts */
+
+    expect_poll(false, false);
+    display_input_poll(920U);   /* release edge confirmed; held=880 ≥ 750
+                                 * and long_fired=false → LONG via release. */
+
+    display_event_t e;
+    TEST_ASSERT_TRUE(display_input_get_event(&e));
+    TEST_ASSERT_EQUAL_INT(DISPLAY_EVENT_NEXT_LONG, e);
+    TEST_ASSERT_FALSE(display_input_get_event(&e));
+}
+
 /* After LONG fired and the user releases, SHORT must NOT fire. */
 void test_next_long_then_release_no_short(void)
 {
