@@ -249,3 +249,118 @@ void test_set_fault_null_code_keeps_string_empty(void)
      * line. We can't inspect the buffer from here without a getter,
      * but the fault_active flag is enough for the test contract. */
 }
+
+/* ---------- Render path ----------
+ * display_controller_render() is a no-op until ssd1306 is up, then
+ * for each effective view it builds the ctx and calls display_render.
+ * These tests exercise that the right ctx path runs for each view —
+ * the actual ctx contents are covered visually on hardware; here we
+ * just want the dispatcher branches executed.
+ */
+
+/* A real u8g2_t is heavyweight; tests need a non-NULL pointer for the
+ * "ssd1306 is up" branch. The mocks never dereference it. */
+static u8g2_t s_fake_u8g2;
+
+void test_render_no_op_when_ssd1306_not_initialised(void)
+{
+    /* ssd1306_u8g2() returns NULL until init succeeds — render must
+     * early-return without touching monitor_state or display_render. */
+    ssd1306_u8g2_ExpectAndReturn(NULL);
+    display_controller_render();
+}
+
+void test_render_main_view(void)
+{
+    /* Fresh init → view = MAIN; render walks the MAIN ctx-build path. */
+    ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
+    monitor_state_get_ExpectAnyArgs();
+    display_label_for_state_ExpectAnyArgsAndReturn("Charging");
+    display_render_ExpectAnyArgs();
+    display_controller_render();
+}
+
+void test_render_alt_thermal_view(void)
+{
+    tick_with_event(0U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_THERMAL, display_controller_view());
+
+    ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
+    monitor_state_get_ExpectAnyArgs();
+    display_render_ExpectAnyArgs();
+    display_controller_render();
+}
+
+void test_render_alt_cooling_view(void)
+{
+    tick_with_event(0U,   DISPLAY_EVENT_NEXT_SHORT);
+    tick_with_event(100U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_COOLING, display_controller_view());
+
+    ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
+    monitor_state_get_ExpectAnyArgs();
+    display_render_ExpectAnyArgs();
+    display_controller_render();
+}
+
+void test_render_alt_battery_view(void)
+{
+    tick_with_event(0U,   DISPLAY_EVENT_NEXT_SHORT);
+    tick_with_event(100U, DISPLAY_EVENT_NEXT_SHORT);
+    tick_with_event(200U, DISPLAY_EVENT_NEXT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_ALT_BATTERY, display_controller_view());
+
+    ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
+    monitor_state_get_ExpectAnyArgs();
+    display_render_ExpectAnyArgs();
+    display_controller_render();
+}
+
+void test_render_menu_view(void)
+{
+    tick_with_event(0U, DISPLAY_EVENT_SELECT_SHORT);
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MENU, display_controller_view());
+
+    ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
+    monitor_state_get_ExpectAnyArgs();
+    display_render_ExpectAnyArgs();
+    display_controller_render();
+}
+
+/* Fault override path: navigated view stays e.g. MAIN, but render
+ * picks FAULT as the effective view and builds the fault ctx. */
+void test_render_fault_override(void)
+{
+    display_controller_set_fault("OVERCURRENT", "32 A > 30 A");
+
+    ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
+    monitor_state_get_ExpectAnyArgs();
+    display_render_ExpectAnyArgs();
+    display_controller_render();
+}
+
+/* set_fault with a NULL detail string makes the fault ctx detail
+ * field NULL — exercises the conditional in the FAULT case. */
+void test_render_fault_override_null_detail(void)
+{
+    display_controller_set_fault("FAULT", NULL);
+
+    ssd1306_u8g2_ExpectAndReturn(&s_fake_u8g2);
+    monitor_state_get_ExpectAnyArgs();
+    display_render_ExpectAnyArgs();
+    display_controller_render();
+}
+
+/* ---------- display_controller_start ----------
+ * Production entry point — init, input_init, spawn the task. We mock
+ * the task spawn so the test doesn't try to run a real FreeRTOS loop.
+ */
+void test_start_calls_init_input_init_and_spawns_task(void)
+{
+    display_input_init_Expect();
+    osThreadNew_ExpectAnyArgsAndReturn((osThreadId_t)0x1234);
+    display_controller_start();
+
+    /* _start also calls _init internally — view should be MAIN. */
+    TEST_ASSERT_EQUAL_INT(DISPLAY_VIEW_MAIN, display_controller_view());
+}
